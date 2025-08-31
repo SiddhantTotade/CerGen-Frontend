@@ -1,2 +1,2 @@
-# CerGen Front
+# CerGen Frontend
 ### Under Development
