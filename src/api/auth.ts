@@ -1,7 +1,18 @@
+import { apiFetch } from './client';
+
 export interface LoginRequest {
   email: string;
   password: string;
 }
+
+export interface RegisterRequest {
+  first_name:string,
+  last_name: string,
+  email: string;
+  password: string;
+  password2:string;
+}
+
 
 export interface LoginResponse {
   token: string;
@@ -12,19 +23,25 @@ export interface LoginResponse {
   };
 }
 
-export const login = async ({ email, password }: LoginRequest): Promise<LoginResponse> => {
-  const response = await fetch('https://your-api.com/login', {
+export interface RegisterResponse {
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export const login = (data: LoginRequest): Promise<LoginResponse> => {
+  return apiFetch('/auth/api/login/', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(data),
   });
+};
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Login failed');
-  }
-
-  return response.json();
+export const register = (data: RegisterRequest): Promise<RegisterResponse> => {
+  return apiFetch('/auth/api/register/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 };

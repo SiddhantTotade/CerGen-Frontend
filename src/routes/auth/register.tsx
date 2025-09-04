@@ -1,11 +1,19 @@
-import { useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router'
+import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { Box,Paper,Typography,TextField,Stack,Button } from '@mui/material';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Stack,
+  Button,
+} from "@mui/material";
+import { useRegister } from "@/hooks/useRegister";
 
-export const Route = createFileRoute('/auth/register')({
+export const Route = createFileRoute("/auth/register")({
   component: RegisterPage,
-})
+});
 
 function RegisterPage() {
   const [form, setForm] = useState({
@@ -13,7 +21,7 @@ function RegisterPage() {
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    password2: "",
   });
 
   const [errors, setErrors] = useState({
@@ -21,8 +29,11 @@ function RegisterPage() {
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    password2: "",
   });
+
+  const navigate = useNavigate();
+  const registerMutation = useRegister();
 
   const handleChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
@@ -41,7 +52,7 @@ function RegisterPage() {
     if (field === "password" && value.length < 6) {
       errorMsg = "Password must be at least 6 characters";
     }
-    if (field === "confirmPassword" && value !== form.password) {
+    if (field === "password2" && value !== form.password) {
       errorMsg = "Passwords do not match";
     }
 
@@ -54,14 +65,29 @@ function RegisterPage() {
       lastName: form.lastName ? "" : "Last name is required",
       email: /\S+@\S+\.\S+/.test(form.email) ? "" : "Invalid email address",
       password:
-        form.password.length >= 6 ? "" : "Password must be at least 6 characters",
-      confirmPassword:
-        form.confirmPassword === form.password ? "" : "Passwords do not match",
+        form.password.length >= 6
+          ? ""
+          : "Password must be at least 6 characters",
+      password2:
+        form.password2 === form.password ? "" : "Passwords do not match",
     };
 
     setErrors(newErrors);
 
     if (Object.values(newErrors).every((e) => e === "")) {
+      registerMutation.mutate(
+        {
+          first_name: form.firstName,
+          last_name: form.lastName,
+          email: form.email,
+          password: form.password,
+          password2: form.password2,
+        },
+        {
+          onSuccess: () => navigate({ to: "/app/home" }),
+          onError: (err) => console.error("Login failed:", err.message),
+        }
+      );
       alert("Form submitted successfully!");
     }
   };
@@ -73,7 +99,10 @@ function RegisterPage() {
       alignItems="center"
       minHeight="100vh"
     >
-      <Paper style={{ width: "25%", padding: "1.3rem", gap: "10px" }} elevation={3}>
+      <Paper
+        style={{ width: "25%", padding: "1.3rem", gap: "10px" }}
+        elevation={3}
+      >
         <Typography align="center" variant="h6">
           Sign up
         </Typography>
@@ -121,10 +150,10 @@ function RegisterPage() {
             label="Confirm Password"
             type="password"
             size="small"
-            value={form.confirmPassword}
-            onChange={(e) => handleChange("confirmPassword", e.target.value)}
-            error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword}
+            value={form.password2}
+            onChange={(e) => handleChange("password2", e.target.value)}
+            error={!!errors.password2}
+            helperText={errors.password2}
           />
           <Button variant="contained" onClick={handleSubmit}>
             Submit
@@ -134,4 +163,3 @@ function RegisterPage() {
     </Box>
   );
 }
-
