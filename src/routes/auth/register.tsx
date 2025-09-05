@@ -85,10 +85,9 @@ function RegisterPage() {
         },
         {
           onSuccess: () => navigate({ to: "/app/home" }),
-          onError: (err) => console.error("Login failed:", err.message),
+          onError: (err) => console.error("Register failed:", err.message),
         }
       );
-      alert("Form submitted successfully!");
     }
   };
 
