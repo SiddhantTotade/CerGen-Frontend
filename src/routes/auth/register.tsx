@@ -1,164 +1,122 @@
 import { useState } from "react";
+import { useRegister } from "@/hooks/useRegister";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
+import { Button } from "@/components/ui/button";
 import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Stack,
-  Button,
-} from "@mui/material";
-import { useRegister } from "@/hooks/useRegister";
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+
+import { registerSchema } from "@/schemas/auth";
+import type { RegisterForm } from "@/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const Route = createFileRoute("/auth/register")({
   component: RegisterPage,
 });
 
 function RegisterPage() {
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    password2: "",
-  });
-
-  const [errors, setErrors] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    password2: "",
-  });
-
   const navigate = useNavigate();
   const registerMutation = useRegister();
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const handleChange = (field: string, value: string) => {
-    setForm({ ...form, [field]: value });
-
-    // live validation
-    let errorMsg = "";
-    if (field === "firstName" && !value.trim()) {
-      errorMsg = "First name is required";
-    }
-    if (field === "lastName" && !value.trim()) {
-      errorMsg = "Last name is required";
-    }
-    if (field === "email" && !/\S+@\S+\.\S+/.test(value)) {
-      errorMsg = "Invalid email address";
-    }
-    if (field === "password" && value.length < 6) {
-      errorMsg = "Password must be at least 6 characters";
-    }
-    if (field === "password2" && value !== form.password) {
-      errorMsg = "Passwords do not match";
-    }
-
-    setErrors({ ...errors, [field]: errorMsg });
-  };
-
-  const handleSubmit = () => {
-    let newErrors = {
-      firstName: form.firstName ? "" : "First name is required",
-      lastName: form.lastName ? "" : "Last name is required",
-      email: /\S+@\S+\.\S+/.test(form.email) ? "" : "Invalid email address",
-      password:
-        form.password.length >= 6
-          ? ""
-          : "Password must be at least 6 characters",
-      password2:
-        form.password2 === form.password ? "" : "Passwords do not match",
-    };
-
-    setErrors(newErrors);
-
-    if (Object.values(newErrors).every((e) => e === "")) {
-      registerMutation.mutate(
-        {
-          first_name: form.firstName,
-          last_name: form.lastName,
-          email: form.email,
-          password: form.password,
-          password2: form.password2,
-        },
-        {
-          onSuccess: () => navigate({ to: "/app/home" }),
-          onError: (err) => console.error("Register failed:", err.message),
-        }
-      );
-    }
+  const onSubmit = (data: RegisterForm) => {
+    registerMutation.mutate(
+      {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        password: data.password,
+        password2: data.password2,
+      },
+      {
+        onSuccess: () => navigate({ to: "/app/home" }),
+        onError: (err) => console.error("Register failed:", err.message),
+      }
+    );
   };
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-    >
-      <Paper
-        style={{ width: "25%", padding: "1.3rem", gap: "10px" }}
-        elevation={3}
-      >
-        <Typography align="center" variant="h6">
-          Sign up
-        </Typography>
-        <Stack marginTop={2} spacing={2}>
-          <TextField
-            fullWidth
-            label="First Name"
-            size="small"
-            value={form.firstName}
-            onChange={(e) => handleChange("firstName", e.target.value)}
-            error={!!errors.firstName}
-            helperText={errors.firstName}
-          />
-          <TextField
-            fullWidth
-            label="Last Name"
-            size="small"
-            value={form.lastName}
-            onChange={(e) => handleChange("lastName", e.target.value)}
-            error={!!errors.lastName}
-            helperText={errors.lastName}
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            type="email"
-            size="small"
-            value={form.email}
-            onChange={(e) => handleChange("email", e.target.value)}
-            error={!!errors.email}
-            helperText={errors.email}
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            size="small"
-            value={form.password}
-            onChange={(e) => handleChange("password", e.target.value)}
-            error={!!errors.password}
-            helperText={errors.password}
-          />
-          <TextField
-            fullWidth
-            label="Confirm Password"
-            type="password"
-            size="small"
-            value={form.password2}
-            onChange={(e) => handleChange("password2", e.target.value)}
-            error={!!errors.password2}
-            helperText={errors.password2}
-          />
-          <Button variant="contained" onClick={handleSubmit}>
-            Submit
+    <Card className="w-full max-w-sm absolute top-5 left-5">
+      <CardHeader>
+        <CardTitle>Login to your account</CardTitle>
+        <CardDescription>
+          Enter your email below to login to your account
+        </CardDescription>
+        <CardAction>
+          <Button className="cursor-pointer" variant="link">
+            Sign Up
           </Button>
-        </Stack>
-      </Paper>
-    </Box>
+        </CardAction>
+      </CardHeader>
+
+      <CardContent>
+        <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-2">
+            <Label htmlFor="first_name">First Name</Label>
+            <Input id="first_name" {...register("first_name")} />
+            {errors.first_name && (
+              <p className="text-red-500 text-sm">{errors.first_name.message}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="last_name">Last Name</Label>
+            <Input id="last_name" {...register("last_name")} />
+            {errors.last_name && (
+              <p className="text-red-500 text-sm">{errors.last_name.message}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" {...register("email")} />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" type="password" {...register("password")} />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="password2">Confirm Password</Label>
+            <Input id="password2" type="password" {...register("password2")} />
+            {errors.password2 && (
+              <p className="text-red-500 text-sm">{errors.password2.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 mt-4">
+            <Button type="submit" className="w-full">
+              Register
+            </Button>
+            <Button variant="outline" className="w-full">
+              Register with Google
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

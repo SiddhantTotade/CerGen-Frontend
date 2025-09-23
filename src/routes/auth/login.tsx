@@ -1,124 +1,103 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import {
-  Box,
-  Paper,
-  Stack,
-  Typography,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Button,
-  Alert,
-  FormControl,
-} from "@mui/material";
-import { VisibilityOff, Visibility } from "@mui/icons-material";
 import { useLogin } from "@/hooks/useRegister";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { loginSchema } from "@/schemas/auth";
+import type { LoginForm } from "@/schemas/auth";
+import { useForm } from "react-hook-form";
 
 export const Route = createFileRoute("/auth/login")({
   component: LoginPage,
 });
 
 function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [credentials, setCredentials] = useState({
-    email: "",
-    password: "",
-  });
   const navigate = useNavigate();
   const loginMutation = useLogin();
 
-  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCredentials((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    loginMutation.mutate(credentials, {
+  const onSubmit = (data: LoginForm) => {
+    loginMutation.mutate(data, {
       onSuccess: () => navigate({ to: "/app/home" }),
       onError: (err) => console.error("Login failed:", err.message),
     });
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-      }}
-    >
-      <Paper sx={{ width: "25%", padding: "1.3rem" }} elevation={3}>
-        <Box component="form" onSubmit={handleSubmit}>
-          <Stack spacing={2}>
-            <Typography variant="h6" align="center">
-              Sign in
-            </Typography>
+    <Card className="w-full max-w-sm absolute top-5 left-5">
+      <CardHeader>
+        <CardTitle>Login to CerGen</CardTitle>
+        <CardDescription>
+          Fill to Generate
+        </CardDescription>
+        <CardAction>
+          <Button className="cursor-pointer" variant="link">
+            Sign Up
+          </Button>
+        </CardAction>
+      </CardHeader>
 
-            {loginMutation.isError && (
-              <Alert severity="error">{loginMutation.error?.message}</Alert>
-            )}
-
-            <FormControl fullWidth>
-              <TextField
-                label="Email"
-                name="email"
+      <CardContent>
+        <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
                 type="email"
-                size="small"
-                value={credentials.email}
-                onChange={handleChange}
+                placeholder="user@example.com"
+                {...register("email")}
               />
-            </FormControl>
-
-            <FormControl fullWidth>
-              <TextField
-                label="Password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                size="small"
-                value={credentials.password}
-                onChange={handleChange}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={togglePasswordVisibility} edge="end">
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </FormControl>
-
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              disabled={loginMutation.isPending}
-            >
-              {loginMutation.isPending ? "Logging in..." : "Login"}
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <a
+                  href="#"
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+              <Input id="password" type="password" {...register("password")} />
+              {errors.password && (
+                <p className="text-red-500 text-sm">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Button type="submit" className="w-full cursor-pointer">
+              Login
             </Button>
-            <Box component="div" style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <Typography>
-                New User ?{" "}
-                <Link style={{ color: "blue" }} to="/auth/register">
-                  Register
-                </Link>
-              </Typography>
-                <Link style={{ color: "blue" }} to="/auth/register">
-                Forget Password ?
-                </Link>
-            </Box>
-          </Stack>
-        </Box>
-      </Paper>
-    </Box>
+            <Button variant="outline" className="w-full cursor-pointer">
+              Login with Google
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
