@@ -15,21 +15,18 @@ export async function parseFile(file: File): Promise<JSONData> {
 
       try {
         if (fileExt === "xls" || fileExt === "xlsx") {
-          // Convert Excel sheet to JSON
           const workbook = XLSX.read(data, { type: "array" });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
 
           const jsonData = XLSX.utils.sheet_to_json<Record<string, any>>(worksheet, {
-            defval: null, // Ensure empty cells are included with null values
+            defval: null,
           });
 
           resolve(jsonData);
         } else if (fileExt === "json") {
-          // Directly parse JSON file
           const parsedData = JSON.parse(data as string);
 
-          // Ensure it's always an array of objects
           if (Array.isArray(parsedData)) {
             resolve(parsedData as JSONData);
           } else {
@@ -43,7 +40,6 @@ export async function parseFile(file: File): Promise<JSONData> {
       }
     };
 
-    // Choose appropriate reading method
     if (fileExt === "xls" || fileExt === "xlsx") {
       reader.readAsArrayBuffer(file);
     } else if (fileExt === "json") {
