@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+input[type="date"] {
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 body {

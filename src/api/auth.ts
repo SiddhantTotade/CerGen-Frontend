@@ -13,7 +13,6 @@ export interface RegisterRequest {
   password2:string;
 }
 
-
 export interface LoginResponse {
   token: string;
   user: {
