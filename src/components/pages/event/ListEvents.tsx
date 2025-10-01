@@ -7,9 +7,14 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+import { useFetchEvents } from "@/hooks/useEvents";
 
 export function ListEvents() {
+  const { data: events, isLoading } = useFetchEvents();
   const items = Array.from({ length: 30 });
+
+  console.log("Data", events);
 
   const chunkArray = <T,>(arr: T[], size: number): T[][] =>
     arr.reduce<T[][]>((acc, _, i) => {
@@ -27,7 +32,7 @@ export function ListEvents() {
 
     const handleSelect = () => {
       const index = emblaApi.selectedScrollSnap();
-      console.log("Current Slide Index:", index); // Debug
+      console.log("Current Slide Index:", index);
       setCurrentIndex(index);
     };
 
@@ -41,19 +46,16 @@ export function ListEvents() {
   }, [emblaApi]);
 
   return (
-    <Card className="transform transition-transform duration-500 -translate-x-3">
+    <Card>
       <CardContent>
-        <Carousel
-          opts={{ align: "start" }}
-          setApi={setEmblaApi}
-        >
+        <Carousel opts={{ align: "end" }} setApi={setEmblaApi}>
           <CarouselContent>
-            {chunks.map((chunk, pageIndex) => (
+            {events?.map((chunk, pageIndex) => (
               <CarouselItem key={pageIndex}>
-                <div className="grid grid-cols-3 gap-4">
-                  {chunk.map((_, index) => (
+                <div className="p-2 grid grid-cols-3 gap-3">
+                  {events?.map((_, index) => (
                     <Card key={index}>
-                      <CardContent className="flex items-center justify-center p-3">
+                      <CardContent className="flex items-center justify-center p-2">
                         <span className="font-semibold">
                           {pageIndex * 9 + index + 1}
                         </span>
@@ -65,11 +67,9 @@ export function ListEvents() {
             ))}
           </CarouselContent>
 
-          {currentIndex > 0 && (
-            <CarouselPrevious className="-left-5" />
-          )}
+          {currentIndex > 0 && <CarouselPrevious className="-left-5" />}
           {currentIndex < chunks.length - 1 && (
-            <CarouselNext className="-right-5"  />
+            <CarouselNext className="-right-5" />
           )}
         </Carousel>
       </CardContent>

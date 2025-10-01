@@ -11,8 +11,14 @@ export interface EventResponse {
 }
 
 export const createEvent = (data: EventRequest): Promise<EventRequest> => {
-  return apiFetch("/app/newevent/", {
+  return apiFetch("/app/api/event/", {
     method: "POST",
     body: JSON.stringify(data),
   });
 };
+
+export const getEvents = ():Promise<EventResponse[]>=>{
+  return apiFetch("/app/api/event",{
+    method:"GET"
+  })
+}
