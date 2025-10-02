@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { eventSchema, type EventForm } from "@/schemas/app";
+import { FormCard } from "./FormCard";
 
 export function FieldBuilder() {
   const [fields, setFields] = useState([{ label: "", type: "text" }]);
@@ -47,9 +48,9 @@ export function FieldBuilder() {
   };
 
   return (
-    <Card>
-      <div className="mx-auto p-4">
-        <h2 className="text-xl font-bold mb-4">Create Fields</h2>
+    <FormCard>
+      <div className="mx-auto">
+        <h2 className="text-xl font-bold mb-2">Create Fields</h2>
         {fields.map((field, index) => (
           <div key={index} className="flex items-center gap-2 mb-3">
             <Input
@@ -100,6 +101,6 @@ export function FieldBuilder() {
           </Button>
         </div>
       </div>
-    </Card>
+    </FormCard>
   );
 }
