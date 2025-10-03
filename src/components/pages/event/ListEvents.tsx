@@ -25,7 +25,6 @@ export function ListEvents() {
   if (isLoading) return <p>Loading events...</p>;
   if (!events?.length) return <p>No events found.</p>;
 
-  // Split events into chunks of 9
   const chunkArray = <T,>(arr: T[], size: number): T[][] =>
     arr.reduce<T[][]>((acc, _, i) => {
       if (i % size === 0) acc.push(arr.slice(i, i + size));
@@ -35,7 +34,7 @@ export function ListEvents() {
   const eventChunks = chunkArray(events, 9);
 
   return (
-    <Card className="w-[40%] h-[55vh]">
+    <Card className="w-[40%] flex justify-center">
       <CardContent>
         <Carousel opts={{ align: "start" }} setApi={setEmblaApi}>
           <CarouselContent>

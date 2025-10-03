@@ -1,106 +1,109 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-import { Card } from "../ui/card";
-
 import { Trash2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { eventSchema, type EventForm } from "@/schemas/app";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { FormCard } from "./FormCard";
+import { eventSchema, type EventForm } from "@/schemas/app";
 
 export function FieldBuilder() {
-  const [fields, setFields] = useState([{ label: "", type: "text" }]);
+  const [title, setTitle] = useState("");
+  const [fields, setFields] = useState([{ label: "", value: "" }]);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<EventForm>({
+  const { handleSubmit } = useForm<EventForm>({
     resolver: zodResolver(eventSchema),
   });
 
   const handleFieldChange = (
     index: number,
-    key: "label" | "type",
-    value: string
+    key: "label" | "value",
+    newValue: string
   ) => {
     const newFields = [...fields];
-    newFields[index][key] = value;
+    newFields[index][key] = newValue;
     setFields(newFields);
   };
 
-  const addField = () => {
-    setFields([...fields, { label: "", type: "text" }]);
-  };
+  const addField = () => setFields([...fields, { label: "", value: "" }]);
+  const removeField = (index: number) =>
+    setFields(fields.filter((_, i) => i !== index));
 
-  const removeField = (index: number) => {
-    const newFields = fields.filter((_, i) => i !== index);
-    setFields(newFields);
+  const onSubmit = () => {
+    const details: Record<string, string> = {};
+    fields.forEach((f) => {
+      if (f.label) details[f.label] = f.value || "";
+    });
+
+    console.log({
+      event: title || "Untitled Event",
+      details,
+    });
+
+    setTitle("");
+    setFields([{ label: "", value: "" }]);
   };
 
   return (
     <FormCard>
-      <div className="mx-auto">
-        <h2 className="text-xl font-bold mb-2">Create Fields</h2>
-        {fields.map((field, index) => (
-          <div key={index} className="flex items-center gap-2 mb-3">
-            <Input
-              type="text"
-              placeholder="Field Label"
-              value={field.label}
-              onChange={(e) =>
-                handleFieldChange(index, "label", e.target.value)
-              }
-              className="flex-1"
-            />
-            <Select
-              value={field.type}
-              onValueChange={(value: any) =>
-                handleFieldChange(index, "type", value)
-              }
-            >
-              <SelectTrigger className="w-36">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="text">Text</SelectItem>
-                <SelectItem value="number">Number</SelectItem>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="password">Password</SelectItem>
-                <SelectItem value="checkbox">Checkbox</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              onClick={() => removeField(index)}
-              disabled={fields.length === 1}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
-        ))}
+      <form
+        className="flex flex-col h-[380px]"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <h2 className="text-xl font-bold mb-2">Create Event</h2>
 
-        <div className="flex justify-between mt-4">
-          <Button type="button" variant="outline" onClick={addField}>
+        <div className="flex-1 overflow-y-auto p-2">
+          <Input
+            type="text"
+            placeholder="Title of the Event"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="mb-3"
+          />
+
+          {fields.map((field, index) => (
+            <div key={index} className="flex items-center gap-2 mb-3">
+              <Input
+                type="text"
+                placeholder="Field Label"
+                value={field.label}
+                onChange={(e) =>
+                  handleFieldChange(index, "label", e.target.value)
+                }
+                className="flex-1"
+              />
+              <Input
+                type="text"
+                placeholder="Field Value"
+                value={field.value}
+                onChange={(e) =>
+                  handleFieldChange(index, "value", e.target.value)
+                }
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => removeField(index)}
+                disabled={fields.length === 1}
+              >
+                <Trash2 size="sm" />
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between pt-3 border-t">
+          <Button size="sm" type="button" variant="outline" onClick={addField}>
             <Plus className="w-4 h-4 mr-2" /> Add Field
           </Button>
-          <Button type="button" onClick={() => handleSubmit}>
+          <Button size="sm" type="submit">
             Submit
           </Button>
         </div>
-      </div>
+      </form>
     </FormCard>
   );
 }

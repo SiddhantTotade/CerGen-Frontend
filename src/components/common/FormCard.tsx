@@ -1,30 +1,32 @@
+import { X } from "lucide-react";
 import type { ReactNode } from "react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCardMode } from "@/hooks/useCardMode";
-import { X } from "lucide-react";
 
 interface FormCardProps {
-    children: ReactNode;
-    className?: string;
+  children: ReactNode;
+  className?: string;
 }
 
 export function FormCard({ children, className }: FormCardProps) {
-    const { setMode } = useCardMode()
+  const { setMode } = useCardMode();
 
-    return (
-        <Card className={`${className || ""}`}>
-            <div className="relative">
-                <Button
-                    className="absolute cursor-pointer -top-3.5 right-2"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setMode("none")}
-                >
-                    <X size="sm" />
-                </Button>
-            </div>
-            <CardContent>{children}</CardContent>
-        </Card>
-    );
+  return (
+    <Card className={`relative w-90 h-[70vh] flex flex-col ${className || ""}`}>
+      <Button
+        className="absolute top-2 right-2 cursor-pointer"
+        variant="ghost"
+        size="icon"
+        onClick={() => setMode("none")}
+      >
+        <X className="h-4 w-4" />
+      </Button>
+
+      <CardContent className="p-4">
+        {children}
+      </CardContent>
+    </Card>
+  );
 }
