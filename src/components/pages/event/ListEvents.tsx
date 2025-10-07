@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import { useFetchEvents } from "@/hooks/useEvents";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
+import { setCardMode } from "@/state/cardMode";
 
 export function ListEvents() {
   const { data: events, isLoading } = useFetchEvents();
@@ -45,7 +46,10 @@ export function ListEvents() {
                 <div className="p-2 grid grid-cols-3 gap-3">
                   {chunk.map((event: any, index: number) => (
                     <Card
-                      onClick={() => setSelectedEvent(event)}
+                      onClick={() => {
+                        setCardMode("show");
+                        setSelectedEvent(event);
+                      }}
                       className="border w-full cursor-pointer"
                       key={index}
                     >

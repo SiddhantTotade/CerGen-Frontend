@@ -1,9 +1,10 @@
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCardMode } from "@/hooks/useCardMode";
+import { Card, CardContent } from "@/components/ui/card";
+import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 
 interface FormCardProps {
   children: ReactNode;
@@ -12,21 +13,22 @@ interface FormCardProps {
 
 export function FormCard({ children, className }: FormCardProps) {
   const { setMode } = useCardMode();
+  const { setSelectedEvent } = useSelectedEvent();
 
   return (
-    <Card className={`relative w-90 h-[70vh] flex flex-col ${className || ""}`}>
+    <Card className={`relative w-90 flex flex-col ${className || ""}`}>
       <Button
         className="absolute top-2 right-2 cursor-pointer"
         variant="ghost"
         size="icon"
-        onClick={() => setMode("none")}
+        onClick={() => {
+          setMode("none");
+          setSelectedEvent(null);
+        }}
       >
-        <X className="h-4 w-4" />
+        <X />
       </Button>
-
-      <CardContent className="p-4">
-        {children}
-      </CardContent>
+      <CardContent className="p-4">{children}</CardContent>
     </Card>
   );
 }

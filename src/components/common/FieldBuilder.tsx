@@ -1,12 +1,13 @@
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2, Plus } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useFieldArray } from "react-hook-form";
 
+import { FormCard } from "./FormCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FormCard } from "./FormCard";
-import { eventSchema, type EventForm } from "@/schemas/app";
 import { useCreateEvent } from "@/hooks/useEvents";
+import { eventSchema, type EventForm } from "@/schemas/app";
+import { setCardMode } from "@/state/cardMode";
 
 export function FieldBuilder() {
   const eventMutation = useCreateEvent();
@@ -25,7 +26,7 @@ export function FieldBuilder() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append } = useFieldArray({
     control,
     name: "details",
   });
@@ -88,7 +89,7 @@ export function FieldBuilder() {
                 variant="destructive"
                 size="sm"
                 className="cursor-pointer"
-                onClick={() => remove(index)}
+                onClick={() => setCardMode("none")}
                 disabled={fields.length === 1}
               >
                 <Trash2 size="sm" />

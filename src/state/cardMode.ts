@@ -1,6 +1,6 @@
 import { queryClient } from "@/lib/queryClient";
 
-export type Mode = "none" | "create" | "edit";
+export type Mode = "none" | "show" | "create" | "edit";
 
 export const cardModeKey = ["cardMode"] as const;
 
