@@ -2,12 +2,12 @@ import { apiFetch } from "./client";
 
 export interface EventRequest {
   event: string;
-  details: string;
+  details: Record<string, string>;
 }
 
 export interface EventResponse {
   event: string;
-  details: string;
+  details: Record<string, string>;
 }
 
 export const createEvent = (data: EventRequest): Promise<EventRequest> => {
@@ -17,8 +17,8 @@ export const createEvent = (data: EventRequest): Promise<EventRequest> => {
   });
 };
 
-export const getEvents = ():Promise<EventResponse[]>=>{
-  return apiFetch("/app/api/event",{
-    method:"GET"
-  })
-}
+export const getEvents = (): Promise<EventResponse[]> => {
+  return apiFetch("/app/api/event", {
+    method: "GET",
+  });
+};

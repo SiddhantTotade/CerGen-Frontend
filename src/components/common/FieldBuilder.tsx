@@ -1,48 +1,53 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2, Plus } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-
 import { FormCard } from "./FormCard";
 import { eventSchema, type EventForm } from "@/schemas/app";
+import { useCreateEvent } from "@/hooks/useEvents";
 
 export function FieldBuilder() {
-  const [title, setTitle] = useState("");
-  const [fields, setFields] = useState([{ label: "", value: "" }]);
+  const eventMutation = useCreateEvent();
 
-  const { handleSubmit } = useForm<EventForm>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<EventForm>({
     resolver: zodResolver(eventSchema),
+    defaultValues: {
+      event: "",
+      details: [{ label: "", value: "" }],
+    },
   });
 
-  const handleFieldChange = (
-    index: number,
-    key: "label" | "value",
-    newValue: string
-  ) => {
-    const newFields = [...fields];
-    newFields[index][key] = newValue;
-    setFields(newFields);
-  };
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "details",
+  });
 
-  const addField = () => setFields([...fields, { label: "", value: "" }]);
-  const removeField = (index: number) =>
-    setFields(fields.filter((_, i) => i !== index));
+  const onSubmit = (data: EventForm) => {
+    const detailsRecord: Record<string, string> = {};
 
-  const onSubmit = () => {
-    const details: Record<string, string> = {};
-    fields.forEach((f) => {
-      if (f.label) details[f.label] = f.value || "";
+    data.details.forEach(({ label, value }) => {
+      if (label) detailsRecord[label] = value || "";
     });
 
-    console.log({
-      event: title || "Untitled Event",
-      details,
+    const payload = {
+      event: data.event,
+      details: detailsRecord,
+    };
+
+    eventMutation.mutate(payload, {
+      onSuccess: () => alert("Event Created Successfully"),
+      onError: (err) => console.log(err),
     });
 
-    setTitle("");
-    setFields([{ label: "", value: "" }]);
+    reset();
   };
 
   return (
@@ -57,36 +62,33 @@ export function FieldBuilder() {
           <Input
             type="text"
             placeholder="Title of the Event"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...register("event")}
             className="mb-3"
           />
+          {errors.event && (
+            <p className="text-red-500 text-sm">{errors.event.message}</p>
+          )}
 
           {fields.map((field, index) => (
-            <div key={index} className="flex items-center gap-2 mb-3">
+            <div key={field.id} className="flex items-center gap-2 mb-3">
               <Input
                 type="text"
                 placeholder="Field Label"
-                value={field.label}
-                onChange={(e) =>
-                  handleFieldChange(index, "label", e.target.value)
-                }
+                {...register(`details.${index}.label` as const)}
                 className="flex-1"
               />
               <Input
                 type="text"
                 placeholder="Field Value"
-                value={field.value}
-                onChange={(e) =>
-                  handleFieldChange(index, "value", e.target.value)
-                }
+                {...register(`details.${index}.value` as const)}
                 className="flex-1"
               />
               <Button
                 type="button"
                 variant="destructive"
                 size="sm"
-                onClick={() => removeField(index)}
+                className="cursor-pointer"
+                onClick={() => remove(index)}
                 disabled={fields.length === 1}
               >
                 <Trash2 size="sm" />
@@ -96,10 +98,16 @@ export function FieldBuilder() {
         </div>
 
         <div className="flex justify-between pt-3 border-t">
-          <Button size="sm" type="button" variant="outline" onClick={addField}>
-            <Plus className="w-4 h-4 mr-2" /> Add Field
+          <Button
+            size="sm"
+            type="button"
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => append({ label: "", value: "" })}
+          >
+            <Plus /> Add Field
           </Button>
-          <Button size="sm" type="submit">
+          <Button className="cursor-pointer" size="sm" type="submit">
             Submit
           </Button>
         </div>

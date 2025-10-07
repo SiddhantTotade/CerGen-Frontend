@@ -8,9 +8,11 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useFetchEvents } from "@/hooks/useEvents";
+import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 
 export function ListEvents() {
   const { data: events, isLoading } = useFetchEvents();
+  const { setSelectedEvent } = useSelectedEvent();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [emblaApi, setEmblaApi] = useState<any>(null);
 
@@ -42,7 +44,11 @@ export function ListEvents() {
               <CarouselItem key={pageIndex}>
                 <div className="p-2 grid grid-cols-3 gap-3">
                   {chunk.map((event: any, index: number) => (
-                    <Card className="border w-full cursor-pointer" key={index}>
+                    <Card
+                      onClick={() => setSelectedEvent(event)}
+                      className="border w-full cursor-pointer"
+                      key={index}
+                    >
                       <CardContent className="flex items-center justify-center p-4">
                         <span className="font-semibold">{event.event}</span>
                       </CardContent>
@@ -53,7 +59,9 @@ export function ListEvents() {
             ))}
           </CarouselContent>
 
-          {currentIndex > 0 && <CarouselPrevious className="-left-5 cursor-pointer" />}
+          {currentIndex > 0 && (
+            <CarouselPrevious className="-left-5 cursor-pointer" />
+          )}
           {currentIndex < eventChunks.length - 1 && (
             <CarouselNext className="-right-5 cursor-pointer" />
           )}
