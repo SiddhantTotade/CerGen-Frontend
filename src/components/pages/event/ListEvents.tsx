@@ -7,15 +7,18 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useFetchEvents } from "@/hooks/useEvents";
-import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 import { setCardMode } from "@/state/cardMode";
+import { Button } from "@/components/ui/button";
+import { useFetchEvents } from "@/hooks/useEvents";
+import { useNavigate } from "@tanstack/react-router";
+import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 
 export function ListEvents() {
   const { data: events, isLoading } = useFetchEvents();
   const { setSelectedEvent } = useSelectedEvent();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [emblaApi, setEmblaApi] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -45,18 +48,33 @@ export function ListEvents() {
               <CarouselItem key={pageIndex}>
                 <div className="p-2 grid grid-cols-3 gap-3">
                   {chunk.map((event: any, index: number) => (
-                    <Card
-                      onClick={() => {
-                        setCardMode("show");
-                        setSelectedEvent(event);
-                      }}
-                      className="border w-full cursor-pointer"
-                      key={index}
-                    >
-                      <CardContent className="flex items-center justify-center p-4">
-                        <span className="font-semibold">{event.event}</span>
-                      </CardContent>
-                    </Card>
+                    <>
+                      <Card
+                        onClick={() =>
+                          navigate({
+                            to: `/app/${event.event}/participants`,
+                            params: { event: event.event },
+                          })
+                        }
+                        className="border w-full cursor-pointer"
+                        key={index}
+                      >
+                        <CardContent className="flex flex-col items-center justify-center p-4">
+                          <span className="font-semibold">{event.event}</span>
+
+                          <Button
+                            onClick={() => {
+                              setCardMode("show");
+                              setSelectedEvent(event);
+                            }}
+                            className="cursor-pointer text-[10px]"
+                            variant="link"
+                          >
+                            View Details
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </>
                   ))}
                 </div>
               </CarouselItem>
