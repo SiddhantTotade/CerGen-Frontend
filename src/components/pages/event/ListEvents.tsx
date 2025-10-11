@@ -48,7 +48,7 @@ export function ListEvents() {
               <CarouselItem key={pageIndex}>
                 <div className="p-2 grid grid-cols-3 gap-3">
                   {chunk.map((event: any, index: number) => (
-                    <>
+                    <div className="border">
                       <Card
                         onClick={() =>
                           navigate({
@@ -61,20 +61,19 @@ export function ListEvents() {
                       >
                         <CardContent className="flex flex-col items-center justify-center p-4">
                           <span className="font-semibold">{event.event}</span>
-
-                          <Button
-                            onClick={() => {
-                              setCardMode("show");
-                              setSelectedEvent(event);
-                            }}
-                            className="cursor-pointer text-[10px]"
-                            variant="link"
-                          >
-                            View Details
-                          </Button>
                         </CardContent>
                       </Card>
-                    </>
+                      <Button
+                        onClick={() => {
+                          setCardMode("show");
+                          setSelectedEvent(event);
+                        }}
+                        className="cursor-pointer text-[10px]"
+                        variant="link"
+                      >
+                        View Details
+                      </Button>
+                    </div>
                   ))}
                 </div>
               </CarouselItem>

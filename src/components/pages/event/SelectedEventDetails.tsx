@@ -4,7 +4,7 @@ import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 export function SelectedEventDetails() {
   const { selectedEvent } = useSelectedEvent();
 
-  if (!selectedEvent) return <p>Hello</p>;
+  if (!selectedEvent) return <p>Event details not found</p>;
 
   return (
     <FormCard>

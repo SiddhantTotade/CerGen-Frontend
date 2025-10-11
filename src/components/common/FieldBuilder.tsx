@@ -4,10 +4,10 @@ import { useForm, useFieldArray } from "react-hook-form";
 
 import { FormCard } from "./FormCard";
 import { Input } from "@/components/ui/input";
+import { setCardMode } from "@/state/cardMode";
 import { Button } from "@/components/ui/button";
 import { useCreateEvent } from "@/hooks/useEvents";
 import { eventSchema, type EventForm } from "@/schemas/app";
-import { setCardMode } from "@/state/cardMode";
 
 export function FieldBuilder() {
   const eventMutation = useCreateEvent();
