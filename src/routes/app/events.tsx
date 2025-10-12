@@ -19,16 +19,19 @@ function EventPage() {
     <div className="flex justify-center m-5 gap-5">
       <Profile />
       <ListEvents />
+
       {mode === "none" && (
         <Button
           className="cursor-pointer"
           onClick={() => setMode("create")}
           size="sm"
         >
-          <Plus size="sm" />
+          <Plus />
         </Button>
       )}
-      {mode === "create" && <FieldBuilder />}
+
+      {(mode === "create" || mode === "edit") && <FieldBuilder />}
+
       {mode === "show" && <SelectedEventDetails />}
     </div>
   );

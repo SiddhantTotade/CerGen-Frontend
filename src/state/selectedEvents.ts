@@ -3,6 +3,7 @@ import { queryClient } from "@/lib/queryClient";
 export const selectedEventKey = ["selectedEvent"] as const;
 
 export interface SelectedEvent {
+  id?: string
   event: string;
   details: Record<string, string>;
 }

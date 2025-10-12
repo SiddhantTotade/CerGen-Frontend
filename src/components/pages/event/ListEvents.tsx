@@ -47,8 +47,8 @@ export function ListEvents() {
             {eventChunks.map((chunk, pageIndex) => (
               <CarouselItem key={pageIndex}>
                 <div className="p-2 grid grid-cols-3 gap-3">
-                  {chunk.map((event: any, index: number) => (
-                    <div className="border">
+                  {chunk.map((event: any) => (
+                    <div key={event.id || event.event} className="border">
                       <Card
                         onClick={() =>
                           navigate({
@@ -57,7 +57,6 @@ export function ListEvents() {
                           })
                         }
                         className="border w-full cursor-pointer"
-                        key={index}
                       >
                         <CardContent className="flex flex-col items-center justify-center p-4">
                           <span className="font-semibold">{event.event}</span>

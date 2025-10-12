@@ -1,54 +1,93 @@
+import { useEffect } from "react";
 import { Trash2, Plus } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 
 import { FormCard } from "./FormCard";
 import { Input } from "@/components/ui/input";
-import { setCardMode } from "@/state/cardMode";
 import { Button } from "@/components/ui/button";
-import { useCreateEvent } from "@/hooks/useEvents";
-import { eventSchema, type EventForm } from "@/schemas/app";
+import { useCardMode } from "@/hooks/useCardMode";
+import { useSelectedEvent } from "@/hooks/useSelectedEvent";
+import { useCreateEvent, useUpdateEvent } from "@/hooks/useEvents";
+import { eventSchema, type EventForm as BaseEventForm } from "@/schemas/app";
+
+export type EventForm = BaseEventForm & { id?: string };
 
 export function FieldBuilder() {
-  const eventMutation = useCreateEvent();
+  const createEventMutation = useCreateEvent();
+  const updateEventMutation = useUpdateEvent();
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<EventForm>({
+  const { mode, setMode } = useCardMode();
+  const { selectedEvent, setSelectedEvent } = useSelectedEvent();
+
+  const { register, control, handleSubmit, formState: { errors }, reset } = useForm<EventForm>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
+      id: undefined,
       event: "",
       details: [{ label: "", value: "" }],
     },
   });
 
-  const { fields, append } = useFieldArray({
+
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "details",
   });
 
+  useEffect(() => {
+    if (mode === "edit" && selectedEvent) {
+      const detailsArray = Object.entries(selectedEvent.details).map(
+        ([label, value]) => ({ label, value })
+      );
+
+      reset({
+        id: selectedEvent.id,
+        event: selectedEvent.event,
+        details: detailsArray,
+      });
+    }
+  }, [mode, selectedEvent, reset]);
+
+
   const onSubmit = (data: EventForm) => {
     const detailsRecord: Record<string, string> = {};
-
     data.details.forEach(({ label, value }) => {
       if (label) detailsRecord[label] = value || "";
     });
 
     const payload = {
+      ...data,
+      id: String(data.id),
       event: data.event,
       details: detailsRecord,
     };
 
-    eventMutation.mutate(payload, {
-      onSuccess: () => alert("Event Created Successfully"),
-      onError: (err) => console.log(err),
-    });
+    if (mode === "edit") {
+      updateEventMutation.mutate(payload, {
+        onSuccess: () => {
+          alert("Event Updated Successfully");
+          setSelectedEvent(payload);
+          setMode("show");
+        },
+        onError: (err) => console.error(err),
+      });
+    } else if (mode === "create") {
+      createEventMutation.mutate(payload, {
+        onSuccess: () => {
+          alert("Event Created Successfully");
+          setSelectedEvent(payload);
+          setMode("show");
+        },
+        onError: (err) => console.error(err),
+      });
+    }
 
-    reset();
+    reset({
+      id: undefined,
+      event: "",
+      details: [{ label: "", value: "" }],
+    });
   };
 
   return (
@@ -57,7 +96,9 @@ export function FieldBuilder() {
         className="flex flex-col h-[380px]"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <h2 className="text-xl font-bold mb-2">Create Event</h2>
+        <h2 className="text-xl font-bold mb-2">
+          {mode === "edit" ? "Edit Event" : "Create Event"}
+        </h2>
 
         <div className="flex-1 overflow-y-auto p-2">
           <Input
@@ -88,11 +129,10 @@ export function FieldBuilder() {
                 type="button"
                 variant="destructive"
                 size="sm"
-                className="cursor-pointer"
-                onClick={() => setCardMode("none")}
+                onClick={() => remove(index)}
                 disabled={fields.length === 1}
               >
-                <Trash2 size="sm" />
+                <Trash2 />
               </Button>
             </div>
           ))}
@@ -103,13 +143,12 @@ export function FieldBuilder() {
             size="sm"
             type="button"
             variant="outline"
-            className="cursor-pointer"
             onClick={() => append({ label: "", value: "" })}
           >
             <Plus /> Add Field
           </Button>
-          <Button className="cursor-pointer" size="sm" type="submit">
-            Submit
+          <Button asChild={false} size="sm" type="submit">
+            {mode === "edit" ? "Update" : "Submit"}
           </Button>
         </div>
       </form>

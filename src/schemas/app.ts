@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const eventSchema = z.object({
+  id: z.coerce.string().optional(),
   event: z.string().min(2, { message: "Enter at least 2 characters" }),
   details: z.array(
     z.object({
@@ -11,4 +12,4 @@ export const eventSchema = z.object({
 });
 
 
-export type EventForm = z.infer<typeof eventSchema>
+export type EventForm = z.infer<typeof eventSchema> & { id?: string }

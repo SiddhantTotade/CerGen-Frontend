@@ -36,7 +36,6 @@ export function FormCard({ children, className }: FormCardProps) {
           size="icon"
           onClick={() => {
             setMode("edit");
-            setSelectedEvent(null);
           }}
         >
           <PenSquare />
