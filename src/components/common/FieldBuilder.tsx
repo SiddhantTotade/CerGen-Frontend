@@ -105,14 +105,14 @@ export function FieldBuilder() {
             type="text"
             placeholder="Title of the Event"
             {...register("event")}
-            className="mb-3"
+            className="mb-1"
           />
           {errors.event && (
-            <p className="text-red-500 text-sm">{errors.event.message}</p>
+            <p className="text-red-500 pl-1 text-[10px]">{errors.event.message}</p>
           )}
 
           {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-2 mb-3">
+            <div key={field.id} className="flex items-center gap-2 mt-2 mb-3">
               <Input
                 type="text"
                 placeholder="Field Label"

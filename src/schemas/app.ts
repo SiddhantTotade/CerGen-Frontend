@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const eventSchema = z.object({
   id: z.coerce.string().optional(),
-  event: z.string().min(2, { message: "Enter at least 2 characters" }),
+  event: z.string().min(2, { message: "Enter at least 2 characters" }).max(20,{message:"Event name must be no more than 20 characters"}),
   details: z.array(
     z.object({
       label: z.string(),

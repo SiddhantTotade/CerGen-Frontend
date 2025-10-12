@@ -18,7 +18,29 @@ export function ListEvents() {
   const { setSelectedEvent } = useSelectedEvent();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [emblaApi, setEmblaApi] = useState<any>(null);
+  const [columns, setColumns] = useState(3); // default 3 columns
   const navigate = useNavigate();
+
+  // Adjust columns based on window width
+  useEffect(() => {
+    const updateColumns = () => {
+      if (window.innerWidth >= 1024) setColumns(3); // desktop
+      else if (window.innerWidth >= 640) setColumns(2); // tablet
+      else setColumns(1); // mobile
+    };
+    updateColumns();
+    window.addEventListener("resize", updateColumns);
+    return () => window.removeEventListener("resize", updateColumns);
+  }, []);
+
+  // Chunk events dynamically based on columns * 3 rows
+  const chunkArray = <T,>(arr: T[], size: number): T[][] =>
+    arr.reduce<T[][]>((acc, _, i) => {
+      if (i % size === 0) acc.push(arr.slice(i, i + size));
+      return acc;
+    }, []);
+
+  const eventChunks = chunkArray(events || [], columns * 3); // 3 rows per page
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -31,24 +53,19 @@ export function ListEvents() {
   if (isLoading) return <p>Loading events...</p>;
   if (!events?.length) return <p>No events found.</p>;
 
-  const chunkArray = <T,>(arr: T[], size: number): T[][] =>
-    arr.reduce<T[][]>((acc, _, i) => {
-      if (i % size === 0) acc.push(arr.slice(i, i + size));
-      return acc;
-    }, []);
-
-  const eventChunks = chunkArray(events, 9);
-
   return (
-    <Card className="w-[40%] flex justify-center">
+    <Card className="w-[50%] flex justify-center">
       <CardContent>
         <Carousel opts={{ align: "start" }} setApi={setEmblaApi}>
           <CarouselContent>
             {eventChunks.map((chunk, pageIndex) => (
               <CarouselItem key={pageIndex}>
-                <div className="p-2 grid grid-cols-3 gap-3">
+                <div
+                  className={`grid grid-rows-3 gap-4`}
+                  style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+                >
                   {chunk.map((event: any) => (
-                    <div key={event.id || event.event} className="border">
+                    <div key={event.id || event.event}>
                       <Card
                         onClick={() =>
                           navigate({
@@ -56,10 +73,12 @@ export function ListEvents() {
                             params: { event: event.event },
                           })
                         }
-                        className="border w-full cursor-pointer"
+                        className="w-full cursor-pointer"
                       >
-                        <CardContent className="flex flex-col items-center justify-center p-4">
-                          <span className="font-semibold">{event.event}</span>
+                        <CardContent>
+                          <span className="font-semibold text-[12px]">
+                            {event.event}
+                          </span>
                         </CardContent>
                       </Card>
                       <Button
