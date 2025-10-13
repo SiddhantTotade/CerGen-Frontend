@@ -54,18 +54,18 @@ export function ListEvents() {
   if (!events?.length) return <p>No events found.</p>;
 
   return (
-    <Card className="w-[50%] flex justify-center">
+    <Card className="w-[40%] flex justify-center">
       <CardContent>
         <Carousel opts={{ align: "start" }} setApi={setEmblaApi}>
           <CarouselContent>
             {eventChunks.map((chunk, pageIndex) => (
               <CarouselItem key={pageIndex}>
                 <div
-                  className={`grid grid-rows-3 gap-4`}
+                  className={`grid grid-rows-3 gap-4 p-2`}
                   style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
                 >
                   {chunk.map((event: any) => (
-                    <div key={event.id || event.event}>
+                    <div className="flex flex-col gap-1" key={event.id || event.event}>
                       <Card
                         onClick={() =>
                           navigate({
@@ -81,16 +81,29 @@ export function ListEvents() {
                           </span>
                         </CardContent>
                       </Card>
+                      <div className="flex gap-1">
+
                       <Button
                         onClick={() => {
                           setCardMode("show");
                           setSelectedEvent(event);
                         }}
-                        className="cursor-pointer text-[10px]"
-                        variant="link"
-                      >
+                        className="cursor-pointer w-[50%] text-[10px] border"
+                        variant="outline"
+                        >
                         View Details
                       </Button>
+                      <Button
+                        onClick={() => {
+                          setCardMode("show");
+                          setSelectedEvent(event);
+                        }}
+                        className="cursor-pointer w-[50%] text-[10px] border"
+                        variant="ghost"
+                        >
+                        Edit
+                      </Button>
+                        </div>
                     </div>
                   ))}
                 </div>
