@@ -18,29 +18,27 @@ export function ListEvents() {
   const { setSelectedEvent } = useSelectedEvent();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [emblaApi, setEmblaApi] = useState<any>(null);
-  const [columns, setColumns] = useState(3); // default 3 columns
+  const [columns, setColumns] = useState(3);
   const navigate = useNavigate();
 
-  // Adjust columns based on window width
   useEffect(() => {
     const updateColumns = () => {
-      if (window.innerWidth >= 1024) setColumns(3); // desktop
-      else if (window.innerWidth >= 640) setColumns(2); // tablet
-      else setColumns(1); // mobile
+      if (window.innerWidth >= 1024) setColumns(3);
+      else if (window.innerWidth >= 640) setColumns(2);
+      else setColumns(1);
     };
     updateColumns();
     window.addEventListener("resize", updateColumns);
     return () => window.removeEventListener("resize", updateColumns);
   }, []);
 
-  // Chunk events dynamically based on columns * 3 rows
   const chunkArray = <T,>(arr: T[], size: number): T[][] =>
     arr.reduce<T[][]>((acc, _, i) => {
       if (i % size === 0) acc.push(arr.slice(i, i + size));
       return acc;
     }, []);
 
-  const eventChunks = chunkArray(events || [], columns * 3); // 3 rows per page
+  const eventChunks = chunkArray(events || [], columns * 3);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -67,12 +65,7 @@ export function ListEvents() {
                   {chunk.map((event: any) => (
                     <div className="flex flex-col gap-1" key={event.id || event.event}>
                       <Card
-                        onClick={() =>
-                          navigate({
-                            to: `/app/${event.event}/participants`,
-                            params: { event: event.event },
-                          })
-                        }
+                        onClick={() => navigate({ to: `/app/${event.id}/participants` })}
                         className="w-full cursor-pointer"
                       >
                         <CardContent>
@@ -83,27 +76,27 @@ export function ListEvents() {
                       </Card>
                       <div className="flex gap-1">
 
-                      <Button
-                        onClick={() => {
-                          setCardMode("show");
-                          setSelectedEvent(event);
-                        }}
-                        className="cursor-pointer w-[50%] text-[10px] border"
-                        variant="outline"
+                        <Button
+                          onClick={() => {
+                            setCardMode("show");
+                            setSelectedEvent(event);
+                          }}
+                          className="cursor-pointer w-[50%] text-[10px] border"
+                          variant="outline"
                         >
-                        View Details
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setCardMode("show");
-                          setSelectedEvent(event);
-                        }}
-                        className="cursor-pointer w-[50%] text-[10px] border"
-                        variant="ghost"
+                          View Details
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setCardMode("show");
+                            setSelectedEvent(event);
+                          }}
+                          className="cursor-pointer w-[50%] text-[10px] border"
+                          variant="ghost"
                         >
-                        Edit
-                      </Button>
-                        </div>
+                          Edit
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>

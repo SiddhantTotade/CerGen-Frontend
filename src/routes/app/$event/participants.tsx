@@ -1,3 +1,4 @@
+import { ListParticipants } from "@/components/pages/participants/ListParticipants";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/$event/participants")({
@@ -5,6 +6,9 @@ export const Route = createFileRoute("/app/$event/participants")({
 });
 
 function RouteComponent() {
-  const { event } = Route.useParams()
-  return <div>Hello "/app/participants"!</div>;
+  return (
+    <div className="flex justify-center m-5 gap-5">
+      <ListParticipants />
+    </div>
+  )
 }
