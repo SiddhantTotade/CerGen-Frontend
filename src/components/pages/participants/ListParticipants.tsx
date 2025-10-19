@@ -57,7 +57,6 @@ export function ListParticipants() {
                             </TableRow>
                         ))}
                     </TableBody>
-
                     <TableFooter>
                         <TableRow>
                             <TableCell colSpan={detailKeys.length + 2}>Total Participants : {participants.length}</TableCell>
