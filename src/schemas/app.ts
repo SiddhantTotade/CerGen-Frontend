@@ -13,7 +13,7 @@ export const eventSchema = z.object({
 
 export const participantSchema = z.object({
   id: z.coerce.string().optional(),
-  event: z.coerce.string().optional(),
+  event: z.coerce.string(),
   participant_details: z.array(
     z.object({
       label: z.string(),

@@ -51,3 +51,19 @@ export const getParticipants = (eventId: string): Promise<ParticipantResponse[]>
     method: "GET",
   })
 }
+
+export const createParticipant = (eventId: string, data: ParticipantRequest): Promise<ParticipantRequest> => {
+  return apiFetch(`/app/api/participant/?event=${eventId}`, {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+}
+
+export const updateParticipant = (data: ParticipantRequest): Promise<ParticipantRequest> => {
+  if (!data.id) throw new Error("Missing participant id for update")
+
+  return apiFetch(`/app/api/participant/?participant=${data.id}`, {
+    method: "PUT",
+    body: JSON.stringify(data)
+  })
+}

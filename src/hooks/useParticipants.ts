@@ -1,7 +1,7 @@
-import { useQuery, } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, } from "@tanstack/react-query";
 
-import { getParticipants } from "@/api/app";
-import type { ParticipantResponse } from "@/api/app";
+import { createParticipant, getParticipants, updateParticipant } from "@/api/app";
+import type { ParticipantRequest, ParticipantResponse } from "@/api/app";
 
 export const useFetchParticipants = (eventId: string) => {
     return useQuery<ParticipantResponse[], Error>({
@@ -14,3 +14,26 @@ export const useFetchParticipants = (eventId: string) => {
         staleTime: 1000 * 60 * 5,
     });
 };
+
+export const useCreateParticipants = (eventId: string) => {
+    const queryClient = useQueryClient()
+
+    return useMutation<ParticipantResponse, Error, ParticipantRequest>({
+        mutationFn: (payload) => createParticipant(eventId, payload),
+        onSuccess: (newParticipant) => {
+            queryClient.setQueryData<ParticipantResponse[]>(["participants"], (old = []) => [...old, newParticipant])
+        }
+    })
+}
+
+export const useUpdateParticipants = () => {
+    const queryClient = useQueryClient()
+
+    return useMutation<ParticipantResponse, Error, ParticipantRequest>({
+        mutationFn: updateParticipant,
+        onSuccess: (updatedParticipant) => {
+            queryClient.setQueryData<ParticipantResponse[]>(["participant"], (old = []) =>
+                old.map((p) => (p.id === updatedParticipant.id ? updatedParticipant : p)))
+        }
+    })
+}

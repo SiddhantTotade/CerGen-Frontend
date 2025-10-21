@@ -23,16 +23,16 @@ function EventPage() {
       {mode === "none" && (
         <Button
           className="cursor-pointer"
-          onClick={() => setMode("create")}
+          onClick={() => setMode("create event")}
           size="sm"
         >
           <Plus />
         </Button>
       )}
 
-      {(mode === "create" || mode === "edit") && <FieldBuilder />}
+      {(mode === "create event" || mode === "edit event") && <FieldBuilder />}
 
-      {mode === "show" && <SelectedEventDetails />}
+      {mode === "show event" && <SelectedEventDetails />}
     </div>
   );
 }

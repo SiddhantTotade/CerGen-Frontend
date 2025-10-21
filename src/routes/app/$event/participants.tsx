@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useParams } from "@tanstack/react-router";
 
 import { FieldBuilder } from "@/components/common/FieldBuilder";
 import { ListParticipants } from "@/components/pages/participants/ListParticipants";
@@ -13,22 +13,23 @@ export const Route = createFileRoute("/app/$event/participants")({
 
 function RouteComponent() {
   const { mode, setMode } = useCardMode()
+  const { event: eventId } = useParams({ from: "/app/$event/participants" })
 
   return (
-    <div className="flex justify-center m-5">
+    <div className="flex justify-center m-5 gap-5">
       <ListParticipants />
       {mode === "none" && (
         <Button
           className="cursor-pointer"
-          onClick={() => setMode("create")}
+          onClick={() => setMode("create participant")}
           size="icon"
         >
           <Plus />
         </Button>
       )}
-      {(mode === "create" || mode === "edit") && <FieldBuilder />}
+      {(mode === "create participant" || mode === "edit participant") && <FieldBuilder eventId={eventId} />}
 
-      {mode === "show" && <SelectedParticipantDetails />}
+      {mode === "show participant" && <SelectedParticipantDetails />}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { queryClient } from "@/lib/queryClient";
 
-export type Mode = "none" | "show" | "create" | "edit";
+export type Mode = "none" | "show event" | "create event" | "edit event" | "show participant" | "create participant" | "edit participant";
 
 export const cardModeKey = ["cardMode"] as const;
 

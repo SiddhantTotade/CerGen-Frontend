@@ -29,13 +29,13 @@ export function FormCard({ children, className }: FormCardProps) {
       >
         <X />
       </Button>
-      {mode === "show" &&
+      {(mode === "show event" || mode === "show participant") &&
         <Button
           className="absolute top-2 right-12 cursor-pointer"
           variant="ghost"
           size="icon"
           onClick={() => {
-            setMode("edit");
+            setMode(mode === "show participant" ? "edit participant" : "edit event");
           }}
         >
           <PenSquare />

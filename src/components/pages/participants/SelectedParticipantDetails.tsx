@@ -1,17 +1,16 @@
 import { FormCard } from "@/components/common/FormCard";
-import { useSelectedEvent } from "@/hooks/useSelectedEvent";
+import { useSelectedParticipant } from "@/hooks/useSelectedParticipant";
 
 export function SelectedParticipantDetails() {
-    const { selectedEvent } = useSelectedEvent();
+    const { selectedParticipant } = useSelectedParticipant();
 
-    if (!selectedEvent) return <p>Hello</p>;
+    if (!selectedParticipant) return <p>Hello</p>;
 
     return (
         <FormCard>
             <div>
-                <h2 className="text-lg font-semibold">{selectedEvent.event}</h2>
                 <ul className="mt-2 space-y-1">
-                    {Object.entries(selectedEvent.details).map(([key, value]) => (
+                    {Object.entries(selectedParticipant.participant_details).map(([key, value]) => (
                         <li key={key} className="flex justify-between">
                             <span className="font-medium">{key}</span>
                             <span>{value}</span>

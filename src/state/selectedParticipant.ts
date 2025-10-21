@@ -5,7 +5,7 @@ export const selectedParticipantKey = ["selectedParticipant"] as const
 export interface SelectedParticipant {
     id?: string
     event: string
-    participants_details: Record<string, string>
+    participant_details: Record<string, string>
 }
 
 export function setSelectedParticipant(participant: SelectedParticipant | null) {

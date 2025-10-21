@@ -78,7 +78,7 @@ export function ListEvents() {
 
                         <Button
                           onClick={() => {
-                            setCardMode("show");
+                            setCardMode("show event");
                             setSelectedEvent(event);
                           }}
                           className="cursor-pointer w-[50%] text-[10px] border"
@@ -88,7 +88,7 @@ export function ListEvents() {
                         </Button>
                         <Button
                           onClick={() => {
-                            setCardMode("show");
+                            setCardMode("show event");
                             setSelectedEvent(event);
                           }}
                           className="cursor-pointer w-[50%] text-[10px] border"
