@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AppTemplatesRouteImport } from './routes/app/templates'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppEventsRouteImport } from './routes/app/events'
 import { Route as AppEvent_detailsRouteImport } from './routes/app/event_details'
@@ -36,6 +37,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/auth/forgot-password',
   path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTemplatesRoute = AppTemplatesRouteImport.update({
+  id: '/app/templates',
+  path: '/app/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppHomeRoute = AppHomeRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/app/event_details': typeof AppEvent_detailsRoute
   '/app/events': typeof AppEventsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/templates': typeof AppTemplatesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/app/event_details': typeof AppEvent_detailsRoute
   '/app/events': typeof AppEventsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/templates': typeof AppTemplatesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/app/event_details': typeof AppEvent_detailsRoute
   '/app/events': typeof AppEventsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/templates': typeof AppTemplatesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/app/event_details'
     | '/app/events'
     | '/app/home'
+    | '/app/templates'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/app/event_details'
     | '/app/events'
     | '/app/home'
+    | '/app/templates'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/app/event_details'
     | '/app/events'
     | '/app/home'
+    | '/app/templates'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   AppEvent_detailsRoute: typeof AppEvent_detailsRoute
   AppEventsRoute: typeof AppEventsRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppTemplatesRoute: typeof AppTemplatesRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/forgot-password'
       fullPath: '/auth/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/templates': {
+      id: '/app/templates'
+      path: '/app/templates'
+      fullPath: '/app/templates'
+      preLoaderRoute: typeof AppTemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/home': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppEvent_detailsRoute: AppEvent_detailsRoute,
   AppEventsRoute: AppEventsRoute,
   AppHomeRoute: AppHomeRoute,
+  AppTemplatesRoute: AppTemplatesRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,

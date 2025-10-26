@@ -24,6 +24,18 @@ export interface ParticipantResponse {
   participant_details: Record<string, string>
 }
 
+export interface TemplateRequest {
+  id?: string
+  template_name: string
+  html_content: string
+}
+
+export interface TemplateResponse {
+  id?: string
+  template_name: string
+  html_content: string
+}
+
 export const getEvents = (): Promise<EventResponse[]> => {
   return apiFetch("/app/api/event", {
     method: "GET",
@@ -65,5 +77,11 @@ export const updateParticipant = (data: ParticipantRequest): Promise<Participant
   return apiFetch(`/app/api/participant/?participant=${data.id}`, {
     method: "PUT",
     body: JSON.stringify(data)
+  })
+}
+
+export const getTemplates = (): Promise<TemplateResponse[]> => {
+  return apiFetch("/app/api/template", {
+    method: "GET"
   })
 }
