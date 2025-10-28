@@ -17,6 +17,7 @@ import { Route as AppTemplatesRouteImport } from './routes/app/templates'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppEventsRouteImport } from './routes/app/events'
 import { Route as AppEvent_detailsRouteImport } from './routes/app/event_details'
+import { Route as AppTemplateTemplateRouteImport } from './routes/app/$template/template'
 import { Route as AppEventParticipantsRouteImport } from './routes/app/$event/participants'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const AppEvent_detailsRoute = AppEvent_detailsRouteImport.update({
   path: '/app/event_details',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTemplateTemplateRoute = AppTemplateTemplateRouteImport.update({
+  id: '/app/$template/template',
+  path: '/app/$template/template',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppEventParticipantsRoute = AppEventParticipantsRouteImport.update({
   id: '/app/$event/participants',
   path: '/app/$event/participants',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/$event/participants': typeof AppEventParticipantsRoute
+  '/app/$template/template': typeof AppTemplateTemplateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/$event/participants': typeof AppEventParticipantsRoute
+  '/app/$template/template': typeof AppTemplateTemplateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/$event/participants': typeof AppEventParticipantsRoute
+  '/app/$template/template': typeof AppTemplateTemplateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/app/$event/participants'
+    | '/app/$template/template'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/app/$event/participants'
+    | '/app/$template/template'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/app/$event/participants'
+    | '/app/$template/template'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AppEventParticipantsRoute: typeof AppEventParticipantsRoute
+  AppTemplateTemplateRoute: typeof AppTemplateTemplateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEvent_detailsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/$template/template': {
+      id: '/app/$template/template'
+      path: '/app/$template/template'
+      fullPath: '/app/$template/template'
+      preLoaderRoute: typeof AppTemplateTemplateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/$event/participants': {
       id: '/app/$event/participants'
       path: '/app/$event/participants'
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AppEventParticipantsRoute: AppEventParticipantsRoute,
+  AppTemplateTemplateRoute: AppTemplateTemplateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

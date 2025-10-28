@@ -1,14 +1,14 @@
-import { ListTemplates } from "@/components/pages/templates/ListTemplates";
+import { HTMLEditor } from "@/components/pages/templates/HTMLEditor";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/app/templates")({
+export const Route = createFileRoute("/app/$template/template")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <div>
-      <ListTemplates />
+      <HTMLEditor />
     </div>
   );
 }
