@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useFetchTemplates } from "@/hooks/useTemplates";
+import { setSelectedTemplate } from "@/state/selectedTemplate";
 
 export function ListTemplates() {
   const { data: templates, isLoading } = useFetchTemplates();
@@ -64,9 +65,10 @@ export function ListTemplates() {
                       key={template.id || template.template_name}
                     >
                       <Card
-                        onClick={() =>
-                          navigate({ to: `/app/${template.id}/template` })
-                        }
+                        onClick={() => {
+                          setSelectedTemplate(template);
+                          navigate({ to: `/app/${template.id}/template` });
+                        }}
                         className="w-full cursor-pointer"
                       >
                         <CardContent>

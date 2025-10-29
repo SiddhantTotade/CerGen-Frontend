@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { createTemplate, getTemplates } from "@/api/app";
+import { createTemplate, getTemplates, updateTemplate } from "@/api/app";
 import type { TemplateRequest, TemplateResponse } from "@/api/app";
 
 export const useFetchTemplates = () => {
@@ -21,6 +21,23 @@ export const useCreateTemplate = () => {
         ["templates"],
         (old = []) => [...old, newTemplate]
       );
+    },
+  });
+};
+
+export const useUpdateTemplate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<TemplateResponse, Error, TemplateRequest>({
+    mutationFn: updateTemplate,
+    onSuccess: (updatedTemplate) => {
+      queryClient.setQueryData<TemplateResponse[]>(["templates"], (old = []) =>
+        old.map((tpl) =>
+          tpl.id === updatedTemplate.id ? updatedTemplate : tpl
+        )
+      );
+
+      queryClient.setQueryData(["selectedTemplate"], updatedTemplate);
     },
   });
 };

@@ -27,7 +27,7 @@ export const participantSchema = z.object({
 
 export const templateSchema = z.object({
   id: z.coerce.string().optional(),
-  template_name: z.coerce.string(),
+  template_name: z.string().min(1, { message: "Template name is required" }),
   html_content: z.coerce.string(),
 });
 

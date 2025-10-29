@@ -107,7 +107,7 @@ export const updateTemplate = (
 ): Promise<TemplateRequest> => {
   if (!data.id) throw new Error("Missing template id for update");
 
-  return apiFetch("/app/api/event/", {
+  return apiFetch("/app/api/template/", {
     method: "PUT",
     body: JSON.stringify(data),
   });
