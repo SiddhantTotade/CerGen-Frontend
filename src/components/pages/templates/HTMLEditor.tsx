@@ -8,13 +8,18 @@ import { Button } from "@/components/ui/button";
 
 import { templateSchema, type TemplateForm } from "@/schemas/app";
 import { useFetchEvents } from "@/hooks/useEvents";
-import { useCreateTemplate, useUpdateTemplate } from "@/hooks/useTemplates";
+import {
+  useCreateTemplate,
+  useFetchTemplateDetails,
+  useUpdateTemplate,
+} from "@/hooks/useTemplates";
 import {
   getSelectedTemplate,
   setSelectedTemplate,
 } from "@/state/selectedTemplate";
 import { FormCard } from "@/components/common/FormCard";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
+import { useParams } from "@tanstack/react-router";
 
 const VOID_TAGS = new Set([
   "area",
@@ -34,10 +39,14 @@ const VOID_TAGS = new Set([
 ]);
 
 export function HTMLEditor() {
+  const { template: templateId } = useParams({
+    from: "/app/$template/template",
+  });
   const { data: events } = useFetchEvents();
   const createTemplateMutation = useCreateTemplate();
   const updateTemplateMutation = useUpdateTemplate();
   const selectedTemplate = getSelectedTemplate();
+  const { data: templates, isLoading } = useFetchTemplateDetails(templateId);
 
   const taRef = useRef<HTMLTextAreaElement | null>(null);
   const [code, setCode] = useState(
@@ -61,14 +70,16 @@ export function HTMLEditor() {
   });
 
   useEffect(() => {
-    if (selectedTemplate) {
-      setValue("id", selectedTemplate.id);
-      setValue("template_name", selectedTemplate.template_name);
-      setValue("html_content", selectedTemplate.html_content);
-      setCode(selectedTemplate.html_content);
-      setSrcDoc(selectedTemplate.html_content);
+    const templateData = templates ?? selectedTemplate;
+
+    if (templateData) {
+      setValue("id", templateData.id);
+      setValue("template_name", templateData.template_name);
+      setValue("html_content", templateData.html_content);
+      setCode(templateData.html_content);
+      setSrcDoc(templateData.html_content);
     }
-  }, [selectedTemplate, setValue]);
+  }, [templates, selectedTemplate, setValue]);
 
   useEffect(() => {
     const id = setTimeout(() => setSrcDoc(code), 250);
@@ -77,33 +88,37 @@ export function HTMLEditor() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== ">") return;
+
     const ta = taRef.current;
     if (!ta) return;
 
-    const value = ta.value;
-    const start = ta.selectionStart ?? 0;
-    const end = ta.selectionEnd ?? 0;
-    const before = value.slice(0, start);
-    const after = value.slice(end);
-    const match = before.match(/<([a-zA-Z][\w-]*)\b[^>]*>$/);
+    const { selectionStart, selectionEnd, value } = ta;
+    const before = value.slice(0, selectionStart);
+    const after = value.slice(selectionEnd);
+
+    const match = before.match(/<([a-zA-Z][\w-]*)[^>]*$/);
     if (!match) return;
 
     const tag = match[1].toLowerCase();
-    if (VOID_TAGS.has(tag)) return;
-    if (after.startsWith(`</${tag}`)) return;
+
+    if (
+      VOID_TAGS.has(tag) ||
+      before.endsWith("</") ||
+      before.endsWith("/>") ||
+      after.trimStart().startsWith(`</${tag}>`)
+    ) {
+      return;
+    }
 
     e.preventDefault();
-    const newValue = before + ">" + `</${tag}>` + after;
-    setCode(newValue);
 
-    setTimeout(() => {
-      const pos = start + 1;
-      if (taRef.current) {
-        taRef.current.selectionStart = pos;
-        taRef.current.selectionEnd = pos;
-        taRef.current.focus();
-      }
-    }, 0);
+    const closing = `></${tag}>`;
+    const newValue = before + closing + after;
+    const cursorPos = selectionStart + 1;
+
+    ta.value = newValue;
+    ta.setSelectionRange(cursorPos, cursorPos);
+    setCode(newValue);
   };
 
   const onSubmit = (data: TemplateForm) => {
@@ -144,20 +159,31 @@ export function HTMLEditor() {
             </CardHeader>
 
             <CardContent className="flex flex-col gap-3 p-3">
-              <Input
-                type="text"
-                placeholder="Template Name"
-                {...register("template_name")}
-              />
-              {errors.template_name && (
-                <p className="text-red-500 pl-1 text-[12px]">
-                  {errors.template_name.message}
-                </p>
-              )}
-              <SearchableSelect
-                events={events ?? []}
-                onSelect={(v) => console.log(v)}
-              />
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Template Name"
+                  {...register("template_name")}
+                  className="p-[19px]"
+                />
+                {errors.template_name && (
+                  <p className="text-red-500 pl-1 text-[12px]">
+                    {errors.template_name.message}
+                  </p>
+                )}
+                <SearchableSelect
+                  events={events ?? []}
+                  onSelect={() => {
+                    if (!templates) return;
+
+                    const template = templates;
+
+                    setSelectedTemplate(template);
+                    setCode(template.html_content);
+                    setSrcDoc(template.html_content);
+                  }}
+                />
+              </div>
               <Controller
                 name="html_content"
                 control={control}
@@ -168,7 +194,7 @@ export function HTMLEditor() {
                     onChange={(e) => setCode(e.target.value)}
                     onKeyDown={handleKeyDown}
                     spellCheck={false}
-                    className="w-full flex-1 resize-none font-mono text-sm p-3 outline-none focus-visible:ring-0 bg-transparent border mt-2"
+                    className="w-full h-[400px] resize-none font-mono text-xs p-3 outline-none focus-visible:ring-0 bg-transparent border mt-2"
                   />
                 )}
               />
@@ -183,7 +209,7 @@ export function HTMLEditor() {
         </form>
       </FormCard>
 
-      <div className="w-1/2">
+      <FormCard className="w-1/2">
         <Card className="h-full border-none shadow-none">
           <CardHeader className="border-b">
             <CardTitle>Live Preview</CardTitle>
@@ -197,7 +223,7 @@ export function HTMLEditor() {
             />
           </CardContent>
         </Card>
-      </div>
+      </FormCard>
     </div>
   );
 }

@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { createTemplate, getTemplates, updateTemplate } from "@/api/app";
+import {
+  createTemplate,
+  getTemplates,
+  getTemplateDetails,
+  updateTemplate,
+} from "@/api/app";
 import type { TemplateRequest, TemplateResponse } from "@/api/app";
 
 export const useFetchTemplates = () => {
@@ -8,6 +13,14 @@ export const useFetchTemplates = () => {
     queryKey: ["templates"],
     queryFn: getTemplates,
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useFetchTemplateDetails = (templateId: string) => {
+  return useQuery<TemplateResponse, Error>({
+    queryKey: ["template", templateId],
+    queryFn: () => getTemplateDetails(templateId),
+    enabled: !!templateId,
   });
 };
 

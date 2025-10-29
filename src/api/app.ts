@@ -93,6 +93,10 @@ export const getTemplates = (): Promise<TemplateResponse[]> => {
   });
 };
 
+export const getTemplateDetails = (id: string): Promise<TemplateResponse> => {
+  return apiFetch(`/app/api/template/${id}/`, { method: "GET" });
+};
+
 export const createTemplate = (
   data: TemplateRequest
 ): Promise<TemplateRequest> => {
