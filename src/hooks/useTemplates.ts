@@ -16,13 +16,16 @@ export const useFetchTemplates = () => {
   });
 };
 
-export const useFetchTemplateDetails = (templateId: string) => {
-  return useQuery<TemplateResponse, Error>({
-    queryKey: ["template", templateId],
-    queryFn: () => getTemplateDetails(templateId),
-    enabled: !!templateId,
+export function useFetchTemplateDetails(
+  templateId?: string,
+  options: { enabled?: boolean } = {}
+) {
+  return useQuery({
+    queryKey: ["templateDetails", templateId],
+    queryFn: () => getTemplateDetails(templateId!),
+    enabled: !!templateId && (options.enabled ?? true),
   });
-};
+}
 
 export const useCreateTemplate = () => {
   const queryClient = useQueryClient();
