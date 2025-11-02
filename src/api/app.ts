@@ -1,4 +1,4 @@
-import { apiFetch } from "./client";
+import { apiFetch, graphqlFetch } from "./client";
 
 export interface EventRequest {
   id?: string;
@@ -36,66 +36,195 @@ export interface TemplateResponse {
   html_content: string;
 }
 
-export const getEvents = (): Promise<EventResponse[]> => {
-  return apiFetch("/app/api/event", {
-    method: "GET",
-  });
+export const getEvents = async () => {
+  const query = `
+    query Events {
+      events {
+        id
+        event
+        details
+        createdAt
+        updatedAt
+      }
+    }
+  `
+  const data = await graphqlFetch<{ events: EventResponse[] }>(query)
+  return data.events
+}
+
+export const createEvent = async (data: EventRequest): Promise<EventRequest> => {
+  const mutation = `
+    mutation CreateEvent($event: String!, $details: GenericScalar!) {
+      createEvent(event: $event, details: $details) {
+        event {
+          id
+          event
+          details
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    event: data.event,
+    details: data.details,
+  };
+
+  const response = await graphqlFetch<{ createEvent: { event: EventRequest } }>(
+    mutation,
+    variables
+  );
+
+  return response.createEvent.event;
 };
 
-export const createEvent = (data: EventRequest): Promise<EventRequest> => {
-  return apiFetch("/app/api/event/", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-};
 
-export const updateEvent = (data: EventRequest): Promise<EventRequest> => {
+export const updateEvent = async (data: EventRequest): Promise<EventResponse> => {
   if (!data.id) throw new Error("Missing event id for update");
 
-  return apiFetch("/app/api/event/", {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
+  const mutation = `
+    mutation UpdateEvent($id: Int!, $event: String!, $details: GenericScalar!) {
+      updateEvent(id: $id, event: $event, details: $details) {
+        event {
+          id
+          event
+          details
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    id: Number(data.id),
+    event: data.event,
+    details: data.details,
+  };
+
+  const response = await graphqlFetch<{ updateEvent: { event: EventResponse } }>(mutation, variables);
+  return response.updateEvent.event;
 };
 
-export const getParticipants = (
+
+export const getParticipants = async (
   eventId: string
 ): Promise<ParticipantResponse[]> => {
-  return apiFetch(`/app/api/participant?event=${eventId}`, {
-    method: "GET",
-  });
+  const query = `
+    query GetParticipants($eventId: Int) {
+      allParticipants(eventId: $eventId) {
+        id
+        participantDetails
+      }
+    }
+  `;
+
+  const variables = { eventId: Number(eventId) };
+
+  const response = await graphqlFetch<{ allParticipants: ParticipantResponse[] }>(
+    query,
+    variables
+  );
+
+  return response.allParticipants;
 };
 
-export const createParticipant = (
+
+export const createParticipant = async (
   eventId: string,
   data: ParticipantRequest
 ): Promise<ParticipantRequest> => {
-  return apiFetch(`/app/api/participant/?event=${eventId}`, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  const mutation = `
+    mutation CreateParticipant($eventId: Int!, $participantDetails: GenericScalar!) {
+      createParticipant(eventId: $eventId, participantDetails: $participantDetails) {
+        participant {
+          id
+          participantDetails
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    eventId: Number(eventId),
+    participantDetails: data.participant_details,
+  };
+
+  const response = await graphqlFetch<{ createParticipant: { participant: ParticipantRequest } }>(
+    mutation,
+    variables
+  );
+
+  return response.createParticipant.participant;
 };
 
-export const updateParticipant = (
+export const updateParticipant = async (
   data: ParticipantRequest
 ): Promise<ParticipantRequest> => {
   if (!data.id) throw new Error("Missing participant id for update");
 
-  return apiFetch(`/app/api/participant/?participant=${data.id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
+  const mutation = `
+    mutation UpdateParticipant($id: Int!, $participantDetails: JSONString!) {
+      updateParticipant(id: $id, participantDetails: $participantDetails) {
+        participant {
+          id
+          participantDetails
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    id: Number(data.id),
+    participantDetails: JSON.stringify(data.participant_details),
+  };
+
+  const response = await graphqlFetch<{ updateParticipant: { participant: ParticipantRequest } }>(
+    mutation,
+    variables
+  );
+
+  return response.updateParticipant.participant;
 };
 
-export const getTemplates = (): Promise<TemplateResponse[]> => {
-  return apiFetch("/app/api/template/", {
-    method: "GET",
-  });
+export const getTemplates = async (): Promise<TemplateResponse[]> => {
+  const query = `
+    query GetTemplates {
+      templates {
+        id
+        templateName
+        htmlContent
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+
+  const response = await graphqlFetch<{ templates: TemplateResponse[] }>(query);
+  return response.templates;
 };
 
-export const getTemplateDetails = (id: string): Promise<TemplateResponse> => {
-  return apiFetch(`/app/api/template/${id}/`, { method: "GET" });
+export const getTemplateDetails = async (id: string): Promise<TemplateResponse> => {
+  const query = `
+    query GetTemplateDetails($id: Int!) {
+      template(id: $id) {
+        id
+        templateName
+        htmlContent
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+
+  const variables = { id: Number(id) };
+
+  const response = await graphqlFetch<{ template: TemplateResponse }>(query, variables);
+  return response.template;
 };
+
 
 export const createTemplate = (
   data: TemplateRequest

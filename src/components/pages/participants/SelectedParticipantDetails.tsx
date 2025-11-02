@@ -4,6 +4,8 @@ import { useSelectedParticipant } from "@/hooks/useSelectedParticipant";
 export function SelectedParticipantDetails() {
     const { selectedParticipant } = useSelectedParticipant();
 
+    console.log(selectedParticipant)
+
     if (!selectedParticipant) return <p>Hello</p>;
 
     return (

@@ -25,6 +25,11 @@ export function ListParticipants() {
         );
     }
 
+    const parsedParticipants = participants.map((p) => ({
+        ...p,
+        participant_details: p.participant_details || {}
+    }));
+
     const getAllKeys = (data: any[]) => {
         const keys = new Set<string>();
         data.forEach((item) => {
@@ -33,7 +38,7 @@ export function ListParticipants() {
         return Array.from(keys);
     };
 
-    const detailKeys = getAllKeys(participants);
+    const detailKeys = getAllKeys(parsedParticipants);
 
     return (
         <Card className="w-[60%] mx-auto p-1 m-0">
@@ -41,19 +46,24 @@ export function ListParticipants() {
                 <TableHeader>
                     <TableRow>
                         {detailKeys.map((key) => (
-                            <TableHead className="text-center" key={key}>{key}</TableHead>
+                            <TableHead className="text-center" key={key}>
+                                {key}
+                            </TableHead>
                         ))}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {participants.map((p) => (
+                    {parsedParticipants.map((p) => (
                         <TableRow key={p.id}>
                             {detailKeys.map((key) => (
-                                <TableCell onClick={() => {
-                                    setCardMode("show participant")
-                                    setSelectedParticipant(p)
-                                }
-                                } className="text-center cursor-pointer" key={key}>
+                                <TableCell
+                                    onClick={() => {
+                                        setCardMode("show participant");
+                                        setSelectedParticipant(p);
+                                    }}
+                                    className="text-center cursor-pointer"
+                                    key={key}
+                                >
                                     {p.participant_details?.[key] ?? "-"}
                                 </TableCell>
                             ))}

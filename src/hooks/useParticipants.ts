@@ -4,16 +4,28 @@ import { createParticipant, getParticipants, updateParticipant } from "@/api/app
 import type { ParticipantRequest, ParticipantResponse } from "@/api/app";
 
 export const useFetchParticipants = (eventId: string) => {
-    return useQuery<ParticipantResponse[], Error>({
-        queryKey: ["participants", eventId],
-        queryFn: async ({ queryKey }) => {
-            const [, eventId] = queryKey
-            return getParticipants(eventId as string)
-        },
-        enabled: !!eventId,
-        staleTime: 1000 * 60 * 5,
-    });
+  return useQuery<ParticipantResponse[], Error>({
+    queryKey: ["participants", eventId],
+    queryFn: async ({ queryKey }) => {
+      const [, eventId] = queryKey;
+      const data = await getParticipants(eventId as string);
+
+      return data.map((p: any) => ({
+        ...p,
+        participant_details: (() => {
+          try {
+            return JSON.parse(p.participantDetails || "{}");
+          } catch {
+            return {};
+          }
+        })(),
+      }));
+    },
+    enabled: !!eventId,
+    staleTime: 1000 * 60 * 5,
+  });
 };
+
 
 export const useCreateParticipants = (eventId: string) => {
     const queryClient = useQueryClient()

@@ -6,15 +6,23 @@ export function SelectedEventDetails() {
 
   if (!selectedEvent) return <p>Hello</p>;
 
+  let parsedDetails: Record<string, unknown> = {};
+
+  try {
+    parsedDetails = JSON.parse(String(selectedEvent.details));
+  } catch (e) {
+    console.error("Failed to parse details:", e);
+  }
+
   return (
     <FormCard>
       <div>
         <h2 className="text-lg font-semibold">{selectedEvent.event}</h2>
         <ul className="mt-2 space-y-1">
-          {Object.entries(selectedEvent.details).map(([key, value]) => (
+          {Object.entries(parsedDetails).map(([key, value]) => (
             <li key={key} className="flex justify-between">
               <span className="font-medium">{key}</span>
-              <span>{value}</span>
+              <span>{String(value)}</span>
             </li>
           ))}
         </ul>

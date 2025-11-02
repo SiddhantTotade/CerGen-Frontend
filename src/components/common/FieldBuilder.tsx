@@ -53,9 +53,15 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
 
   useEffect(() => {
     if (mode === "edit event" && selectedEvent) {
-      const detailsArray = Object.entries(selectedEvent.details).map(
-        ([label, value]) => ({ label, value })
-      );
+      const detailsRecord: Record<string, unknown> =
+        typeof selectedEvent.details === "string"
+          ? JSON.parse(selectedEvent.details)
+          : selectedEvent.details || {};
+
+      const detailsArray = Object.entries(detailsRecord).map(([label, value]) => ({
+        label,
+        value: String(value ?? ""),
+      }));
 
       reset({
         id: selectedEvent.id,
@@ -66,9 +72,15 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       replace(detailsArray);
     }
     else if (mode === "edit participant" && selectedParticipant && eventId) {
-      const detailsArray = Object.entries(selectedParticipant.participant_details ?? {}).map(
-        ([label, value]) => ({ label, value })
-      );
+      const participantRecord: Record<string, unknown> =
+        typeof selectedParticipant.participant_details === "string"
+          ? JSON.parse(selectedParticipant.participant_details)
+          : selectedParticipant.participant_details || {};
+
+      const detailsArray = Object.entries(participantRecord).map(([label, value]) => ({
+        label,
+        value: String(value ?? ""),
+      }));
 
       reset({
         id: selectedParticipant.id,
@@ -88,7 +100,6 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       replace(emptyRow);
     }
   }, [mode, selectedEvent, selectedParticipant, eventId, reset, replace]);
-
 
 
   const onSubmit = (data: CombinedForm) => {
