@@ -1,4 +1,4 @@
-import { apiFetch, graphqlFetch } from "./client";
+import { graphqlFetch } from "./client";
 
 export interface EventRequest {
   id?: string;
@@ -10,6 +10,11 @@ export interface EventResponse {
   id?: string;
   event: string;
   details: Record<string, string>;
+}
+
+export interface EventKeyResponse {
+  detailKeys: string[];
+  participantDetailKeys: string[];
 }
 
 export interface ParticipantRequest {
@@ -226,22 +231,79 @@ export const getTemplateDetails = async (id: string): Promise<TemplateResponse> 
 };
 
 
-export const createTemplate = (
+export const createTemplate = async (
   data: TemplateRequest
-): Promise<TemplateRequest> => {
-  return apiFetch("/app/api/template/", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+): Promise<TemplateResponse> => {
+  const mutation = `
+    mutation CreateTemplate($templateName: String!, $htmlContent: String!) {
+      createTemplate(templateName: $templateName, htmlContent: $htmlContent) {
+        template {
+          id
+          templateName
+          htmlContent
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    templateName: data.template_name,
+    htmlContent: data.html_content,
+  };
+
+  const response = await graphqlFetch<{ createTemplate: { template: TemplateResponse } }>(
+    mutation,
+    variables
+  );
+
+  return response.createTemplate.template;
 };
 
-export const updateTemplate = (
-  data: TemplateRequest
-): Promise<TemplateRequest> => {
-  if (!data.id) throw new Error("Missing template id for update");
 
-  return apiFetch("/app/api/template/", {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
+export const updateTemplate = async (data: TemplateRequest): Promise<TemplateResponse> => {
+  const query = `
+    mutation UpdateTemplate($id: Int!, $templateName: String!, $htmlContent: String!) {
+      updateTemplate(id: $id, templateName: $templateName, htmlContent: $htmlContent) {
+        template {
+          id
+          templateName
+          htmlContent
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    id: Number(data.id),
+    templateName: data.template_name,
+    htmlContent: data.html_content,
+  };
+
+  const response = await graphqlFetch<{ updateTemplate: { template: TemplateResponse } }>(
+    query,
+    variables
+  );
+
+  // @ts-ignore
+  return response.data.updateTemplate.template;
+};
+
+export const getEventKeys = async (eventId: string): Promise<EventKeyResponse> => {
+  const query = `
+    query GetEventKeys($eventId: Int!) {
+      eventData(eventId: $eventId) {
+        detailKeys
+        participantDetailKeys
+      }
+    }
+  `;
+
+  const variables = { eventId: Number(eventId) };
+
+  const response = await graphqlFetch<{ eventData: EventKeyResponse }>(query, variables);
+  return response.eventData;
 };

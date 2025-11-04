@@ -21,6 +21,9 @@ import {
 import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { useMatch, useParams } from "@tanstack/react-router";
 import { setCardMode } from "@/state/cardMode";
+import { eventKeysKey } from "@/state/selectedTemplateKeys";
+import { Badge } from "@/components/ui/badge";
+import { useQueryClient } from "@tanstack/react-query";
 
 const VOID_TAGS = new Set([
   "area",
@@ -40,7 +43,6 @@ const VOID_TAGS = new Set([
 ]);
 
 export function HTMLEditor() {
-  // ✅ Safely detect if current route is edit
   const isEditRoute = useMatch({
     from: "/app/$template/template",
     shouldThrow: false,
@@ -55,16 +57,26 @@ export function HTMLEditor() {
 
   const isEditMode = Boolean(templateId);
 
-  // ✅ Update card mode globally
   useEffect(() => {
     setCardMode(isEditMode ? "edit template" : "create template");
   }, [isEditMode]);
 
-  // ✅ API hooks
   const { data: events } = useFetchEvents();
   const createTemplateMutation = useCreateTemplate();
   const updateTemplateMutation = useUpdateTemplate();
   const selectedTemplate = getSelectedTemplate();
+
+  const queryClient = useQueryClient()
+  const [eventKeys, setEventKeysState] = useState(() => queryClient.getQueryData(eventKeysKey) ?? null);
+
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+      const data = queryClient.getQueryData(eventKeysKey) ?? null;
+      setEventKeysState(data);
+    });
+    return unsubscribe;
+  }, [queryClient]);
+
 
   const { data: templateData, isLoading } = useFetchTemplateDetails(
     templateId,
@@ -73,12 +85,10 @@ export function HTMLEditor() {
     }
   );
 
-  // ✅ Editor state
   const taRef = useRef<HTMLTextAreaElement | null>(null);
   const [code, setCode] = useState("<h1>paperLess 📄</h1>");
   const [srcDoc, setSrcDoc] = useState(code);
 
-  // ✅ React Hook Form setup
   const {
     register,
     control,
@@ -94,26 +104,31 @@ export function HTMLEditor() {
     },
   });
 
-  // ✅ Pre-fill data in edit mode
   useEffect(() => {
     const dataToUse = isEditMode ? templateData : selectedTemplate;
 
     if (dataToUse) {
-      setValue("id", dataToUse.id || "");
-      setValue("template_name", dataToUse.template_name || "");
-      setValue("html_content", dataToUse.html_content || "");
-      setCode(dataToUse.html_content || "<h1>Hello World 👋</h1>");
-      setSrcDoc(dataToUse.html_content || "<h1>Hello World 👋</h1>");
+      const id = dataToUse.id || "";
+      const templateName =
+        // @ts-ignore
+        dataToUse.template_name || dataToUse.templateName || "";
+      const htmlContent =
+        // @ts-ignore
+        dataToUse.html_content || dataToUse.htmlContent || "<h1>paperLess 📄</h1>";
+
+      setValue("id", id);
+      setValue("template_name", templateName);
+      setValue("html_content", htmlContent);
+      setCode(htmlContent);
+      setSrcDoc(htmlContent);
     }
   }, [isEditMode, templateData, selectedTemplate, setValue]);
 
-  // ✅ Live preview delay
   useEffect(() => {
     const id = setTimeout(() => setSrcDoc(code), 250);
     return () => clearTimeout(id);
   }, [code]);
 
-  // ✅ Handle auto tag closing
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== ">") return;
     const ta = taRef.current;
@@ -146,7 +161,6 @@ export function HTMLEditor() {
     setCode(newValue);
   };
 
-  // ✅ Submit handler
   const onSubmit = (data: TemplateForm) => {
     const payload = {
       id: data.id,
@@ -188,17 +202,35 @@ export function HTMLEditor() {
                 </p>
               )}
               <SearchableSelect
-                events={events ?? []}
-                onSelect={() => {
-                  if (!templateData) return;
-                  setSelectedTemplate(templateData);
-                  setCode(templateData.html_content);
-                  setSrcDoc(templateData.html_content);
-                }}
+                events={(events ?? []).map((e) => ({
+                  id: e.id || "",
+                  event: e.event,
+                  details: e.details,
+                }))}
               />
             </div>
+            <div className="flex w-full gap-2">
+              <Card className="p-0 w-full">
+                <p className="border-b pl-4 flex item-center"><small><b>Event Keys Reference</b></small></p>
+                <div className="flex item-center gap-2 p-1">
+                  {/* @ts-ignore */}
+                  {eventKeys?.detailKeys.map((e: string, i: number) => (
 
-            {/* ✅ Textarea with skeleton */}
+                    <Badge key={i} variant="outline">{e}</Badge>
+                  ))}
+                </div>
+              </Card>
+              <Card className="p-0 w-full">
+                <p className="border-b pl-4 flex item-center"><small><b>Participant Keys Reference</b></small></p>
+                <div className="flex item-center gap-2">
+                  {/* @ts-ignore */}
+                  {eventKeys?.participantDetailKeys.map((e: string, i: number) => (
+
+                    <Badge key={i} variant="outline">{e}</Badge>
+                  ))}
+                </div>
+              </Card>
+            </div>
             <div className="relative w-full h-[400px]">
               <Controller
                 name="html_content"
@@ -222,7 +254,6 @@ export function HTMLEditor() {
               )}
             </div>
           </CardContent>
-
           <div className="p-3 border-t">
             <Button type="submit" className="w-full">
               {isEditMode ? "Update Template" : "Save Template"}
@@ -231,7 +262,6 @@ export function HTMLEditor() {
         </Card>
       </form>
 
-      {/* ✅ Live Preview */}
       <Card className="h-full border shadow-none">
         <CardContent className="p-0 h-[calc(100vh-80px)] overflow-hidden">
           <iframe

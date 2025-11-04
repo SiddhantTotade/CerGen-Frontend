@@ -15,20 +15,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getEventKeys } from "@/api/app";
+import { setEventKeys } from "@/state/selectedTemplateKeys";
 
 type Event = {
-  id?: string;
+  id: string;
   event: string;
   details: Record<string, string>;
 };
 
-export function SearchableSelect({
-  events,
-  onSelect,
-}: {
-  events: Event[];
-  onSelect: (value: string) => void;
-}) {
+export function SearchableSelect({ events }: { events: Event[] }) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [selected, setSelected] = React.useState<string>("");
@@ -40,6 +36,25 @@ export function SearchableSelect({
       Object.values(e.details).join(" ").toLowerCase().includes(searchLower)
     );
   });
+
+  const handleSelect = async (id: string) => {
+    setSelected(id);
+    setOpen(false);
+    try {
+      const res = await getEventKeys(id);
+
+      const { detailKeys, participantDetailKeys } = res;
+
+      setEventKeys({
+        detailKeys,
+        participantDetailKeys,
+      });
+
+    } catch (err) {
+      console.error("Failed to fetch event keys:", err);
+    }
+  };
+
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -71,11 +86,7 @@ export function SearchableSelect({
                 <CommandItem
                   key={event.id}
                   value={event.id}
-                  onSelect={() => {
-                    setSelected(event.id || "");
-                    onSelect(event.id || "");
-                    setOpen(false);
-                  }}
+                  onSelect={() => handleSelect(event.id)}
                 >
                   <Check
                     className={cn(

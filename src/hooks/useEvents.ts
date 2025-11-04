@@ -1,7 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { getEvents, createEvent, updateEvent } from "@/api/app";
-import type { EventRequest, EventResponse } from "@/api/app";
+import { getEvents, createEvent, updateEvent, getEventKeys } from "@/api/app";
+import type { EventRequest, EventResponse, EventKeyResponse } from "@/api/app";
+
+export const useGetKeys = (eventId: string) => {
+  return useQuery<EventKeyResponse, Error>({
+    queryKey: ["eventKeys", eventId],
+    queryFn: ({ queryKey }) => {
+      const [, eventId] = queryKey;
+      return getEventKeys(eventId as string);
+    },
+    enabled: !!eventId,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
 
 export const useFetchEvents = () => {
   return useQuery<EventResponse[], Error>({
