@@ -8,6 +8,12 @@ input[type="date"] {
 
 @custom-variant dark (&:is(.dark *));
 
+html,
+#app {
+  background-color: #1a1d23;
+  color: #d1d5db;
+}
+
 body {
   @apply m-0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
