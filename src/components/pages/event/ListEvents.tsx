@@ -9,10 +9,10 @@ import {
 } from "@/components/ui/carousel";
 import { setCardMode } from "@/state/cardMode";
 import { Button } from "@/components/ui/button";
+import { useCardMode } from "@/hooks/useCardMode";
 import { useFetchEvents } from "@/hooks/useEvents";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
-import { useCardMode } from "@/hooks/useCardMode";
 
 export function ListEvents() {
   const { data: events, isLoading } = useFetchEvents();
@@ -21,7 +21,7 @@ export function ListEvents() {
   const [emblaApi, setEmblaApi] = useState<any>(null);
   const [columns, setColumns] = useState(3);
   const navigate = useNavigate();
-  const { mode, setMode } = useCardMode()
+  const { mode, setMode } = useCardMode();
 
   useEffect(() => {
     const updateColumns = () => {
@@ -54,13 +54,13 @@ export function ListEvents() {
   if (!events?.length) return <p>No events found.</p>;
 
   return (
-    <Card className="w-[40%] flex justify-center">
+    <Card id="custom_card" className="w-[50%] flex justify-center">
       <CardContent>
-        <div className=" border-b pl-3 pb-2 flex justify-between items-center">
-          <p className="text-lg font-bold">Events</p>
+        <div className="border-b pl-3 pb-2 flex justify-between items-center">
+          <p className="text-lg text-white font-bold">Events</p>
           {mode === "none" && (
             <Button
-              className="cursor-pointer text-xs"
+              className="cursor-pointer text-sm bg-blue-500 hover:bg-blue-600"
               onClick={() => setMode("create event")}
               size="sm"
             >
@@ -77,9 +77,15 @@ export function ListEvents() {
                   style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
                 >
                   {chunk.map((event: any) => (
-                    <div className="flex flex-col gap-1" key={event.id || event.event}>
+                    <div
+                      className="flex flex-col gap-1"
+                      key={event.id || event.event}
+                    >
                       <Card
-                        onClick={() => navigate({ to: `/app/${event.id}/participants` })}
+                      id="custom_card"
+                        onClick={() =>
+                          navigate({ to: `/app/${event.id}/participants` })
+                        }
                         className="w-full cursor-pointer"
                       >
                         <CardContent>
@@ -89,7 +95,6 @@ export function ListEvents() {
                         </CardContent>
                       </Card>
                       <div className="flex gap-1">
-
                         <Button
                           onClick={() => {
                             setCardMode("show event");

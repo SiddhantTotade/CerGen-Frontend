@@ -14,6 +14,10 @@ html,
   color: #d1d5db;
 }
 
+#custom_card {
+  background-color: #101622;
+}
+
 body {
   @apply m-0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -142,4 +146,20 @@ code {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes text {
+  0%,
+  100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+.animate-text {
+  animation: text 5s ease infinite;
 }
