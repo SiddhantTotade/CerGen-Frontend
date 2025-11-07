@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { setCardMode } from "@/state/cardMode";
 import { useMatch, useParams } from "@tanstack/react-router";
 import TemplateForm from "./components/TemplateForm";
@@ -26,15 +25,13 @@ export function HTMLEditor() {
   const [srcDoc, setSrcDoc] = useState("<h1>paperLess 📄</h1>");
 
   return (
-    // <div className="min-h-screen flex bg-background text-foreground">
-    <Card className="flex">
+    <div className="min-h-screen flex bg-background text-foreground">
       <TemplateForm
         templateId={templateId}
         isEditMode={isEditMode}
         onPreviewChange={setSrcDoc}
       />
       <PreviewPane srcDoc={srcDoc} />
-    </Card>
-    // </div>
+    </div>
   );
 }

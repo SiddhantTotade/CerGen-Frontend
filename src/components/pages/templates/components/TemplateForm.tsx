@@ -121,7 +121,7 @@ export default function TemplateForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex border w-1/2">
       <Card className="h-full border-none shadow-none">
         <CardContent className="flex flex-col gap-3 p-3">
           <TemplateFields register={register} errors={errors} events={events} />

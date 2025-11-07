@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useFetchEvents } from "@/hooks/useEvents";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
+import { useCardMode } from "@/hooks/useCardMode";
 
 export function ListEvents() {
   const { data: events, isLoading } = useFetchEvents();
@@ -20,6 +21,7 @@ export function ListEvents() {
   const [emblaApi, setEmblaApi] = useState<any>(null);
   const [columns, setColumns] = useState(3);
   const navigate = useNavigate();
+  const { mode, setMode } = useCardMode()
 
   useEffect(() => {
     const updateColumns = () => {
@@ -54,6 +56,18 @@ export function ListEvents() {
   return (
     <Card className="w-[40%] flex justify-center">
       <CardContent>
+        <div className=" border-b pl-3 pb-2 flex justify-between items-center">
+          <p className="text-lg font-bold">Events</p>
+          {mode === "none" && (
+            <Button
+              className="cursor-pointer text-xs"
+              onClick={() => setMode("create event")}
+              size="sm"
+            >
+              Create Event
+            </Button>
+          )}
+        </div>
         <Carousel opts={{ align: "start" }} setApi={setEmblaApi}>
           <CarouselContent>
             {eventChunks.map((chunk, pageIndex) => (
