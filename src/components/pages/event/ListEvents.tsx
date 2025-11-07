@@ -13,6 +13,8 @@ import { useCardMode } from "@/hooks/useCardMode";
 import { useFetchEvents } from "@/hooks/useEvents";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
+import { ArrowRight } from "lucide-react";
+import { formatToISOWithTZ } from "@/utils/dateTimeConverter";
 
 export function ListEvents() {
   const { data: events, isLoading } = useFetchEvents();
@@ -82,40 +84,32 @@ export function ListEvents() {
                       key={event.id || event.event}
                     >
                       <Card
-                      id="custom_card"
                         onClick={() =>
                           navigate({ to: `/app/${event.id}/participants` })
                         }
-                        className="w-full cursor-pointer"
+                        className="w-full p-1 cursor-pointer bg-stone-800"
                       >
-                        <CardContent>
-                          <span className="font-semibold text-[12px]">
+                        <CardContent className="p-1 flex flex-col">
+                          <span className="font-semibold text-lg text-white">
                             {event.event}
                           </span>
+                          <div>
+                            <small className="font-semibold text-xs text-white">
+                              {formatToISOWithTZ(event.createdAt)}
+                            </small>
+                          </div>
                         </CardContent>
                       </Card>
-                      <div className="flex gap-1">
-                        <Button
-                          onClick={() => {
-                            setCardMode("show event");
-                            setSelectedEvent(event);
-                          }}
-                          className="cursor-pointer w-[50%] text-[10px] border"
-                          variant="outline"
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setCardMode("show event");
-                            setSelectedEvent(event);
-                          }}
-                          className="cursor-pointer w-[50%] text-[10px] border"
-                          variant="ghost"
-                        >
-                          Edit
-                        </Button>
-                      </div>
+                      <Button
+                        onClick={() => {
+                          setCardMode("show event");
+                          setSelectedEvent(event);
+                        }}
+                        className="cursor-pointer text-[10px] text-white"
+                        variant="link"
+                      >
+                        View Details <ArrowRight />
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -124,10 +118,10 @@ export function ListEvents() {
           </CarouselContent>
 
           {currentIndex > 0 && (
-            <CarouselPrevious className="-left-5 cursor-pointer" />
+            <CarouselPrevious className="-left-5 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white" />
           )}
           {currentIndex < eventChunks.length - 1 && (
-            <CarouselNext className="-right-5 cursor-pointer" />
+            <CarouselNext className="-right-5 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white" />
           )}
         </Carousel>
       </CardContent>
