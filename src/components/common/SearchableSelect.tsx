@@ -18,82 +18,84 @@ import { cn } from "@/lib/utils";
 import { getEventKeys } from "@/api/app";
 import { setEventKeys } from "@/state/selectedTemplateKeys";
 
-type Event = {
-  id: string;
-  event: string;
-  details: Record<string, string>;
-};
+type GenericItem = Record<string, any>;
 
-export function SearchableSelect({ events }: { events: Event[] }) {
+export function SearchableSelect({
+  items,
+  labelKey = "event",
+  idKey = "id",
+  shouldFetchKeys = true,
+  onSelectItem, // 👈 new prop
+}: {
+  items: GenericItem[];
+  labelKey?: string;
+  idKey?: string;
+  shouldFetchKeys?: boolean;
+  onSelectItem?: (item: GenericItem) => void;
+}) {
   const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState("");
   const [selected, setSelected] = React.useState<string>("");
-
-  const filteredEvents = events.filter((e) => {
-    const searchLower = search.toLowerCase();
-    return (
-      e.event.toLowerCase().includes(searchLower) ||
-      Object.values(e.details).join(" ").toLowerCase().includes(searchLower)
-    );
-  });
 
   const handleSelect = async (id: string) => {
     setSelected(id);
     setOpen(false);
+
+    const item = items.find((i) => String(i[idKey]) === id);
+    if (onSelectItem && item) onSelectItem(item); // ✅ send selected item up
+
+    if (!shouldFetchKeys) return;
+
     try {
       const res = await getEventKeys(id);
-
       const { detailKeys, participantDetailKeys } = res;
-
-      setEventKeys({
-        detailKeys,
-        participantDetailKeys,
-      });
-
+      setEventKeys({ detailKeys, participantDetailKeys });
     } catch (err) {
       console.error("Failed to fetch event keys:", err);
     }
   };
 
+  const selectedItem = items.find((i) => String(i[idKey]) === selected);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger
+        id="custom_card"
+        className="hover:text-white cursor-pointer"
+        asChild
+      >
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {selected
-            ? events.find((e) => e.id === selected)?.event
-            : "Select event..."}
+          {selectedItem ? selectedItem[labelKey] : "Select item..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
 
       <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput
-            placeholder="Search event..."
-            value={search}
-            onValueChange={setSearch}
-          />
+        <Command id="custom_card" className="text-white">
+          <CommandInput placeholder="Search..." />
           <CommandList>
-            <CommandEmpty>No event found.</CommandEmpty>
+            <CommandEmpty>No matches found.</CommandEmpty>
             <CommandGroup>
-              {filteredEvents.map((event) => (
+              {items.map((item) => (
                 <CommandItem
-                  key={event.id}
-                  value={event.id}
-                  onSelect={() => handleSelect(event.id)}
+                  key={item[idKey]}
+                  value={String(item[labelKey])}
+                  onSelect={() => handleSelect(String(item[idKey]))}
+                  className="text-white cursor-pointer"
                 >
                   <Check
                     className={cn(
-                      selected === event.id ? "opacity-100" : "opacity-0"
+                      "mr-2 h-4 w-4",
+                      selected === String(item[idKey])
+                        ? "opacity-100"
+                        : "opacity-0"
                     )}
                   />
-                  {event.event}
+                  {item[labelKey]}
                 </CommandItem>
               ))}
             </CommandGroup>

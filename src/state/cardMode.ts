@@ -9,7 +9,9 @@ export type Mode =
   | "create participant"
   | "edit participant"
   | "create template"
-  | "edit template";
+  | "edit template"
+  | "generate event template"
+  | "generate participant template";
 
 export const cardModeKey = ["cardMode"] as const;
 

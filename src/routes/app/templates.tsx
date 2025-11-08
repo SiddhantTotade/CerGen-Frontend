@@ -1,30 +1,20 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Navigation } from "@/components/common/Navigation";
 import { ListTemplates } from "@/components/pages/templates/ListTemplates";
-import { Button } from "@/components/ui/button";
-import { useCardMode } from "@/hooks/useCardMode";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
 
 export const Route = createFileRoute("/app/templates")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { setMode } = useCardMode();
-  const navigate = useNavigate();
-
   return (
-    <div>
-      <Button
-        className="cursor-pointer"
-        onClick={() => {
-          setMode("create template");
-          navigate({ to: "/app/template/create" });
-        }}
-        size="sm"
-      >
-        <Plus />
-      </Button>
-      <ListTemplates />
+    <div className="flex flex-col justify-center m-5 gap-5">
+      <div className="flex justify-center">
+        <Navigation />
+      </div>
+      <div className="flex justify-center">
+        <ListTemplates />
+      </div>
     </div>
   );
 }

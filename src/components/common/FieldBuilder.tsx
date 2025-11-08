@@ -174,7 +174,7 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
   return (
     <FormCard>
       <form
-        className="flex flex-col h-[380px]"
+        className="flex flex-col h-[380px] relative"
         onSubmit={handleSubmit(onSubmit as any)}
       >
         <h2 className="text-xl font-bold mb-2">
@@ -194,7 +194,6 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
                         : ""
           }
         </h2>
-
         <div className="flex-1 overflow-y-auto p-2">
           {!isParticipantMode &&
             <Input
@@ -220,7 +219,7 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
           {fields.map((field, index) => {
             const fieldName = isParticipantMode ? "participant_details" : "details"
             return (
-              <div key={field.id} className="flex items-center gap-2 mt-2 mb-3">
+              <div key={field.id} className="flex items-center gap-2 mt-2">
                 <Input
                   type="text"
                   placeholder="Field Label"
@@ -234,9 +233,10 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
                   className="flex-1"
                 />
                 <Button
+                  className="cursor-pointer"
                   type="button"
                   variant="destructive"
-                  size="sm"
+                  size="icon"
                   onClick={() => remove(index)}
                   disabled={fields.length === 1}
                 >
@@ -246,9 +246,9 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
             )
           })}
         </div>
-
-        <div className="flex justify-between pt-3 border-t">
+        <div className="bottom-0 w-full absolute flex justify-between pt-3 border-t">
           <Button
+            className="cursor-pointer text-black hover:bg-gray-100"
             size="sm"
             type="button"
             variant="outline"
@@ -256,7 +256,7 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
           >
             <Plus /> Add Field
           </Button>
-          <Button asChild={false} size="sm" type="submit">
+          <Button className="bg-blue-500 hover:bg-blue-600 cursor-pointer" asChild={false} size="sm" type="submit">
             {mode === "edit event" ? "Update" : "Submit"}
           </Button>
         </div>

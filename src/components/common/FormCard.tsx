@@ -1,11 +1,12 @@
-import { X } from "lucide-react";
-import { PenSquare } from "lucide-react";
 import type { ReactNode } from "react";
+import { PenSquare } from "lucide-react";
+import { Users, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCardMode } from "@/hooks/useCardMode";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
+import { TemplateDialog } from "./TemplateDialog";
 
 interface FormCardProps {
   children: ReactNode;
@@ -17,31 +18,45 @@ export function FormCard({ children, className }: FormCardProps) {
   const { setSelectedEvent } = useSelectedEvent();
 
   return (
-    <Card className={`relative w-90 flex flex-col ${className || ""}`}>
-      <Button
-        className="absolute top-2 right-2 cursor-pointer"
-        variant="ghost"
-        size="icon"
-        onClick={() => {
-          setMode("none");
-          setSelectedEvent(null);
-        }}
-      >
-        <X />
-      </Button>
-      {(mode === "show event" || mode === "show participant") &&
+    <Card id="custom_card" className={`w-90 p-2 gap-1 text-white flex flex-col ${className || ""}`}>
+      <div className="flex justify-between">
+        <div className="flex gap-2">
+          {mode != "create event" &&
+            <TemplateDialog />
+          }
+          <Button
+            className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
+            size="icon"
+            onClick={() => {
+              setMode(mode === "show participant" ? "edit participant" : "edit event");
+            }}
+          >
+            <Users />
+          </Button>
+          {(mode === "show event" || mode === "show participant") &&
+            <Button
+              className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
+              size="icon"
+              onClick={() => {
+                setMode(mode === "show participant" ? "edit participant" : "edit event");
+              }}
+            >
+              <PenSquare />
+            </Button>
+          }
+        </div>
         <Button
-          className="absolute top-2 right-12 cursor-pointer"
-          variant="ghost"
+          className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
           size="icon"
           onClick={() => {
-            setMode(mode === "show participant" ? "edit participant" : "edit event");
+            setMode("none");
+            setSelectedEvent(null);
           }}
         >
-          <PenSquare />
+          <X />
         </Button>
-      }
-      <CardContent className="p-4">{children}</CardContent>
+      </div>
+      <CardContent className="p-1">{children}</CardContent>
     </Card>
   );
 }

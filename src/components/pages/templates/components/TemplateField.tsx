@@ -16,11 +16,7 @@ export default function TemplateFields({ register, errors, events }: any) {
         </p>
       )}
       <SearchableSelect
-        events={(events ?? []).map((e: any) => ({
-          id: e.id || "",
-          event: e.event,
-          details: e.details,
-        }))}
+        items={events}
       />
     </div>
   );
