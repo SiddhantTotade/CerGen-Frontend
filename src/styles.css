@@ -163,3 +163,28 @@ code {
 .animate-text {
   animation: text 5s ease infinite;
 }
+
+html {
+  overflow-y: overlay;
+  scrollbar-gutter: stable;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.scrolling ::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.6);
+}

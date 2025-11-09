@@ -14,14 +14,14 @@ function EventPage() {
   const { mode } = useCardMode();
 
   return (
-    <div>
-      <div className="flex justify-center m-5 gap-5">
+    <div className="flex flex-col justify-center m-5 gap-5">
+      <div className="flex justify-center">
+        <Navigation />
+      </div>
+      <div className="flex justify-center gap-5">
         <ListEvents />
         {(mode === "create event" || mode === "edit event") && <FieldBuilder />}
         {mode === "show event" && <SelectedEventDetails />}
-      </div>
-      <div className="flex justify-center">
-        <Navigation />
       </div>
     </div>
   );

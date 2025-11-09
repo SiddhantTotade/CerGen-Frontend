@@ -25,7 +25,7 @@ export function HTMLEditor() {
   const [srcDoc, setSrcDoc] = useState("<h1>paperLess 📄</h1>");
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
+    <div className="flex gap-5">
       <TemplateForm
         templateId={templateId}
         isEditMode={isEditMode}

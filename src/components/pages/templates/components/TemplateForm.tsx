@@ -121,12 +121,12 @@ export default function TemplateForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex border w-1/2">
-      <Card className="h-full border-none shadow-none">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex w-1/2">
+      <Card id="custom_card" className="h-full relative border-none shadow-none w-full text-white">
         <CardContent className="flex flex-col gap-3 p-3">
           <TemplateFields register={register} errors={errors} events={events} />
           <EventKeysSection eventKeys={eventKeys} />
-          <div className="relative w-full h-[400px]">
+          <div className="relative w-full">
             <Controller
               name="html_content"
               control={control}
@@ -145,8 +145,8 @@ export default function TemplateForm({
             )}
           </div>
         </CardContent>
-        <div className="p-3 border-t">
-          <Button type="submit" className="w-full">
+        <div className="p-3 absolute w-full flex justify-end bottom-0">
+          <Button type="submit" className="bg-blue-500 hover:bg-blue-600 cursor-pointer">
             {isEditMode ? "Update Template" : "Save Template"}
           </Button>
         </div>

@@ -21,13 +21,13 @@ import { setEventKeys } from "@/state/selectedTemplateKeys";
 type GenericItem = Record<string, any>;
 
 export function SearchableSelect({
-  items,
+  items = [],
   labelKey = "event",
   idKey = "id",
   shouldFetchKeys = true,
-  onSelectItem, // 👈 new prop
+  onSelectItem,
 }: {
-  items: GenericItem[];
+  items?: GenericItem[];
   labelKey?: string;
   idKey?: string;
   shouldFetchKeys?: boolean;
@@ -40,10 +40,11 @@ export function SearchableSelect({
     setSelected(id);
     setOpen(false);
 
+    if (!Array.isArray(items) || items.length === 0) return;
     const item = items.find((i) => String(i[idKey]) === id);
-    if (onSelectItem && item) onSelectItem(item); // ✅ send selected item up
+    if (onSelectItem && item) onSelectItem(item);
 
-    if (!shouldFetchKeys) return;
+    if (!shouldFetchKeys || !id) return;
 
     try {
       const res = await getEventKeys(id);
@@ -54,7 +55,10 @@ export function SearchableSelect({
     }
   };
 
-  const selectedItem = items.find((i) => String(i[idKey]) === selected);
+  const selectedItem =
+    Array.isArray(items) && items.length > 0
+      ? items.find((i) => String(i[idKey]) === selected)
+      : null;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -67,7 +71,7 @@ export function SearchableSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between text-white hover:text-white"
         >
           {selectedItem ? selectedItem[labelKey] : "Select item..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -80,24 +84,28 @@ export function SearchableSelect({
           <CommandList>
             <CommandEmpty>No matches found.</CommandEmpty>
             <CommandGroup>
-              {items.map((item) => (
-                <CommandItem
-                  key={item[idKey]}
-                  value={String(item[labelKey])}
-                  onSelect={() => handleSelect(String(item[idKey]))}
-                  className="text-white cursor-pointer"
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selected === String(item[idKey])
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
-                  {item[labelKey]}
-                </CommandItem>
-              ))}
+              {Array.isArray(items) && items.length > 0 ? (
+                items.map((item) => (
+                  <CommandItem
+                    key={item[idKey]}
+                    value={String(item[labelKey])}
+                    onSelect={() => handleSelect(String(item[idKey]))}
+                    className="text-white cursor-pointer"
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selected === String(item[idKey])
+                          ? "opacity-100"
+                          : "opacity-0"
+                      )}
+                    />
+                    {item[labelKey]}
+                  </CommandItem>
+                ))
+              ) : (
+                <CommandEmpty>No items available.</CommandEmpty>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>

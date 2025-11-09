@@ -21,20 +21,6 @@ export default function PreviewPane({ srcDoc }: { srcDoc?: string }) {
 
     const injectedStyle = `
       <style>
-        html, body {
-          margin: 0;
-          padding: 0;
-          height: 100%;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: flex-start;
-          overflow: auto !important;
-        }
-        body::-webkit-scrollbar {
-          width: 0px;
-          background: transparent;
-        }
       </style>
     `;
 
@@ -65,7 +51,7 @@ export default function PreviewPane({ srcDoc }: { srcDoc?: string }) {
   }, [srcDoc]);
 
   return (
-    <CardContent className="relative p-4 bg-gray-100 h-[500px] w-full overflow-hidden rounded-lg">
+    <CardContent className="relative p-4 bg-gray-100 h-[500px] w-1/2 overflow-hidden rounded-lg">
       <div className="absolute top-2 right-2 z-10 flex gap-1 p-1 rounded-md" id="custom_card">
         <Button className="text-black hover:text-black hover:bg-gray-200 bg-white cursor-pointer" size="icon" onClick={handleZoomOut}>
           <ZoomOut className="h-4 w-4" />

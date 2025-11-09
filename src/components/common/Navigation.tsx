@@ -8,9 +8,12 @@ export function Navigation() {
 
   return (
     <Card
-      className="p-2 flex flex-row w-[50%] justify-between items-center"
+      className="p-2 flex flex-row w-[40%] justify-between items-center"
       id="custom_card"
     >
+      <div className="flex text-white font-bold text-xl">
+        <p>PaperLess</p>
+      </div>
       <div className="gap-2 flex">
         <Button
           className="cursor-pointer bg-blue-500 hover:bg-blue-600"
@@ -25,10 +28,6 @@ export function Navigation() {
         >
           <LayoutTemplateIcon />
         </Button>
-      </div>
-      <div className="flex bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 bg-clip-text text-transparent animate-text font-serif italic font-black text-lg">
-        <p>paper</p>
-        <p>Less</p>
       </div>
     </Card>
   );
