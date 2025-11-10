@@ -47,7 +47,7 @@ export default function HTMLTextEditor({ code, setCode, disabled }: any) {
       onKeyDown={handleKeyDown}
       spellCheck={false}
       disabled={disabled}
-      className="w-full h-[230px] resize-none font-mono text-xs p-3 outline-none focus-visible:ring-0 bg-transparent border mt-2"
+      className="w-full h-[250px] resize-none font-mono text-xs outline-none focus-visible:ring-0 bg-transparent border mt-2"
     />
   );
 }
