@@ -17,6 +17,7 @@ export default function TemplateFields({ register, errors, events }: any) {
       )}
       <SearchableSelect
         items={events}
+        label="Select Event"
       />
     </div>
   );

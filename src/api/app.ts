@@ -1,4 +1,4 @@
-import { graphqlFetch } from "./client";
+import { apiFetch, graphqlFetch } from "./client";
 
 export interface EventRequest {
   id?: string;
@@ -40,6 +40,22 @@ export interface TemplateResponse {
   template_name: string;
   html_content: string;
 }
+
+export interface GenerateEventTemplateRequest {
+  event_id?: string
+  template_id: string
+  orientation: string
+}
+
+export interface GenerateEventTemplateResponse {
+  success: boolean;
+  message: string;
+  data: {
+    html: string;
+    pdf_data: string;
+  };
+}
+
 
 export const getEvents = async () => {
   const query = `
@@ -306,4 +322,13 @@ export const getEventKeys = async (eventId: string): Promise<EventKeyResponse> =
 
   const response = await graphqlFetch<{ eventData: EventKeyResponse }>(query, variables);
   return response.eventData;
+};
+
+export const generateEventTemplate = (
+  data: GenerateEventTemplateRequest
+): Promise<GenerateEventTemplateResponse> => {
+  return apiFetch("/app/api/generate-event/", {
+    method: "POST",
+    body: JSON.stringify(data),
+  }) as Promise<GenerateEventTemplateResponse>;
 };

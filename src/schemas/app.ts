@@ -31,6 +31,12 @@ export const templateSchema = z.object({
   html_content: z.coerce.string(),
 });
 
+export const eventTemplateSchema = z.object({
+  event_id: z.coerce.string(),
+  template_id: z.coerce.string(),
+  orientation: z.string()
+})
+
 export type EventForm = z.infer<typeof eventSchema> & { id?: string };
 export type ParticipantForm = z.infer<typeof participantSchema> & {
   id?: string;

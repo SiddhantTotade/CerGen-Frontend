@@ -6,17 +6,18 @@ import { ZoomIn, ZoomOut, RefreshCw } from "lucide-react";
 export default function PreviewPane({ srcDoc }: { srcDoc?: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [zoom, setZoom] = useState(1);
-
+  
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.1, 2));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.1, 0.3));
   const handleReset = () => setZoom(1);
+  const isTemplateCreate = location.href.includes("/app/template/create");
 
   const htmlWithInjectedStyle = useMemo(() => {
     const htmlContent =
       // @ts-ignore
       typeof srcDoc === "object" && srcDoc?.htmlContent
         ? // @ts-ignore
-          srcDoc.htmlContent
+        srcDoc.htmlContent
         : srcDoc || "";
 
     const injectedStyle = `
@@ -52,7 +53,8 @@ export default function PreviewPane({ srcDoc }: { srcDoc?: string }) {
   }, [srcDoc]);
 
   return (
-    <CardContent className="relative p-4 h-[300px] bg-gray-100 w-full overflow-hidden rounded-lg">
+    <CardContent className={`relative p-4 bg-gray-100 w-full overflow-hidden rounded-lg ${isTemplateCreate ? "h-[510px]" : "h-[300px]"
+      }`}>
       <div
         className="absolute top-2 right-2 z-10 flex gap-1 p-1 rounded-md"
         id="custom_card"

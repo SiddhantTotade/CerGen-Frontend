@@ -7,7 +7,7 @@ export const Route = createFileRoute("/app/template/create")({
 
 function RouteComponent() {
   return (
-    <div>
+    <div className="m-5">
       <HTMLEditor />
     </div>
   );
