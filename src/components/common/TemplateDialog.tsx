@@ -24,17 +24,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { base64ToPdf } from "@/utils/base64ToPdf";
 
 export function TemplateDialog() {
   const { data: templates } = useFetchTemplates();
   const [selectedTemplate, setSelectedTemplate] = React.useState<any>(null);
   const [orientation, setOrientation] = React.useState<string>("");
-  const [previewHtml, setPreviewHtml] = React.useState<string>("");
   const event = getSelectedEvent();
 
-  const { mutateAsync: generateTemplate, isPending } = useGenerateEventTemplate();
+  const { mutateAsync: generateTemplate, isPending } =
+    useGenerateEventTemplate();
 
-  // 👇 Button handler (not form submit)
   const handleGenerate = async () => {
     if (!selectedTemplate?.id || !orientation) {
       alert("Please select both template and orientation!");
@@ -48,14 +48,10 @@ export function TemplateDialog() {
         orientation,
       };
 
-      console.log("Payload:", payload);
-
       const res = await generateTemplate(payload);
 
-      console.log("Response:", res);
-
       if (res.success) {
-        // setPreviewHtml(res.data);
+        base64ToPdf(res.data.pdf_data, String(event?.event));
       } else {
         alert("Failed: " + res.message);
       }
@@ -118,13 +114,8 @@ export function TemplateDialog() {
               </SelectContent>
             </Select>
           </div>
-
-          {previewHtml ? (
-            <PreviewPane srcDoc={previewHtml} />
-          ) : (
-            <div className="text-gray-400 text-sm italic">
-              Select a template and orientation to preview
-            </div>
+          {selectedTemplate && (
+            <PreviewPane srcDoc={selectedTemplate?.htmlContent} />
           )}
         </div>
 
