@@ -50,7 +50,7 @@ export function ListTemplates() {
         <div className="p-2 flex justify-between items-center">
           <p className="text-lg text-white font-bold">Templates</p>
           <div className="flex gap-2">
-            {mode === "none" && (
+            {mode === "none" && !allSelected && (
               <Button
                 className="cursor-pointer text-sm bg-blue-500 hover:bg-blue-600"
                 onClick={() => {
