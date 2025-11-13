@@ -42,9 +42,9 @@ export interface TemplateResponse {
 }
 
 export interface GenerateEventTemplateRequest {
-  event_id?: string
-  template_id: string
-  orientation: string
+  event_id?: string;
+  template_id: string;
+  orientation: string;
 }
 
 export interface GenerateEventTemplateResponse {
@@ -55,7 +55,6 @@ export interface GenerateEventTemplateResponse {
     pdf_data: string;
   };
 }
-
 
 export const getEvents = async () => {
   const query = `
@@ -68,12 +67,14 @@ export const getEvents = async () => {
         updatedAt
       }
     }
-  `
-  const data = await graphqlFetch<{ events: EventResponse[] }>(query)
-  return data.events
-}
+  `;
+  const data = await graphqlFetch<{ events: EventResponse[] }>(query);
+  return data.events;
+};
 
-export const createEvent = async (data: EventRequest): Promise<EventRequest> => {
+export const createEvent = async (
+  data: EventRequest
+): Promise<EventRequest> => {
   const mutation = `
     mutation CreateEvent($event: String!, $details: GenericScalar!) {
       createEvent(event: $event, details: $details) {
@@ -101,8 +102,9 @@ export const createEvent = async (data: EventRequest): Promise<EventRequest> => 
   return response.createEvent.event;
 };
 
-
-export const updateEvent = async (data: EventRequest): Promise<EventResponse> => {
+export const updateEvent = async (
+  data: EventRequest
+): Promise<EventResponse> => {
   if (!data.id) throw new Error("Missing event id for update");
 
   const mutation = `
@@ -125,33 +127,38 @@ export const updateEvent = async (data: EventRequest): Promise<EventResponse> =>
     details: data.details,
   };
 
-  const response = await graphqlFetch<{ updateEvent: { event: EventResponse } }>(mutation, variables);
+  const response = await graphqlFetch<{
+    updateEvent: { event: EventResponse };
+  }>(mutation, variables);
   return response.updateEvent.event;
 };
-
 
 export const getParticipants = async (
   eventId: string
 ): Promise<ParticipantResponse[]> => {
   const query = `
-    query GetParticipants($eventId: Int) {
-      allParticipants(eventId: $eventId) {
-        id
-        participantDetails
-      }
+query GetParticipants($eventId: Int) {
+  allParticipants(eventId: $eventId) {
+    id
+    participantDetails
+    event {
+      id
+      event
+      details
     }
+  }
+}
+
   `;
 
   const variables = { eventId: Number(eventId) };
 
-  const response = await graphqlFetch<{ allParticipants: ParticipantResponse[] }>(
-    query,
-    variables
-  );
+  const response = await graphqlFetch<{
+    allParticipants: ParticipantResponse[];
+  }>(query, variables);
 
   return response.allParticipants;
 };
-
 
 export const createParticipant = async (
   eventId: string,
@@ -173,10 +180,9 @@ export const createParticipant = async (
     participantDetails: data.participant_details,
   };
 
-  const response = await graphqlFetch<{ createParticipant: { participant: ParticipantRequest } }>(
-    mutation,
-    variables
-  );
+  const response = await graphqlFetch<{
+    createParticipant: { participant: ParticipantRequest };
+  }>(mutation, variables);
 
   return response.createParticipant.participant;
 };
@@ -202,10 +208,9 @@ export const updateParticipant = async (
     participantDetails: JSON.stringify(data.participant_details),
   };
 
-  const response = await graphqlFetch<{ updateParticipant: { participant: ParticipantRequest } }>(
-    mutation,
-    variables
-  );
+  const response = await graphqlFetch<{
+    updateParticipant: { participant: ParticipantRequest };
+  }>(mutation, variables);
 
   return response.updateParticipant.participant;
 };
@@ -227,7 +232,9 @@ export const getTemplates = async (): Promise<TemplateResponse[]> => {
   return response.templates;
 };
 
-export const getTemplateDetails = async (id: string): Promise<TemplateResponse> => {
+export const getTemplateDetails = async (
+  id: string
+): Promise<TemplateResponse> => {
   const query = `
     query GetTemplateDetails($id: Int!) {
       template(id: $id) {
@@ -242,10 +249,12 @@ export const getTemplateDetails = async (id: string): Promise<TemplateResponse> 
 
   const variables = { id: Number(id) };
 
-  const response = await graphqlFetch<{ template: TemplateResponse }>(query, variables);
+  const response = await graphqlFetch<{ template: TemplateResponse }>(
+    query,
+    variables
+  );
   return response.template;
 };
-
 
 export const createTemplate = async (
   data: TemplateRequest
@@ -269,16 +278,16 @@ export const createTemplate = async (
     htmlContent: data.html_content,
   };
 
-  const response = await graphqlFetch<{ createTemplate: { template: TemplateResponse } }>(
-    mutation,
-    variables
-  );
+  const response = await graphqlFetch<{
+    createTemplate: { template: TemplateResponse };
+  }>(mutation, variables);
 
   return response.createTemplate.template;
 };
 
-
-export const updateTemplate = async (data: TemplateRequest): Promise<TemplateResponse> => {
+export const updateTemplate = async (
+  data: TemplateRequest
+): Promise<TemplateResponse> => {
   const query = `
     mutation UpdateTemplate($id: Int!, $templateName: String!, $htmlContent: String!) {
       updateTemplate(id: $id, templateName: $templateName, htmlContent: $htmlContent) {
@@ -299,16 +308,17 @@ export const updateTemplate = async (data: TemplateRequest): Promise<TemplateRes
     htmlContent: data.html_content,
   };
 
-  const response = await graphqlFetch<{ updateTemplate: { template: TemplateResponse } }>(
-    query,
-    variables
-  );
+  const response = await graphqlFetch<{
+    updateTemplate: { template: TemplateResponse };
+  }>(query, variables);
 
   // @ts-ignore
   return response.data.updateTemplate.template;
 };
 
-export const getEventKeys = async (eventId: string): Promise<EventKeyResponse> => {
+export const getEventKeys = async (
+  eventId: string
+): Promise<EventKeyResponse> => {
   const query = `
     query GetEventKeys($eventId: Int!) {
       eventData(eventId: $eventId) {
@@ -320,7 +330,10 @@ export const getEventKeys = async (eventId: string): Promise<EventKeyResponse> =
 
   const variables = { eventId: Number(eventId) };
 
-  const response = await graphqlFetch<{ eventData: EventKeyResponse }>(query, variables);
+  const response = await graphqlFetch<{ eventData: EventKeyResponse }>(
+    query,
+    variables
+  );
   return response.eventData;
 };
 
