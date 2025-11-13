@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,8 +26,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { base64ToPdf } from "@/utils/base64ToPdf";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-export function TemplateDialog() {
+interface Props {
+  label?: string;
+}
+
+export function TemplateDialog({ label }: Props) {
   const { data: templates } = useFetchTemplates();
   const [selectedTemplate, setSelectedTemplate] = React.useState<any>(null);
   const [orientation, setOrientation] = React.useState<string>("");
@@ -36,10 +42,7 @@ export function TemplateDialog() {
     useGenerateEventTemplate();
 
   const handleGenerate = async () => {
-    if (!selectedTemplate?.id || !orientation) {
-      alert("Please select both template and orientation!");
-      return;
-    }
+    if (!selectedTemplate?.id || !orientation) return;
 
     try {
       const payload = {
@@ -53,7 +56,7 @@ export function TemplateDialog() {
       if (res.success) {
         base64ToPdf(res.data.pdf_data, String(event?.event));
       } else {
-        alert("Failed: " + res.message);
+        toast("Failed: " + res.message);
       }
     } catch (err) {
       console.error(err);
@@ -63,14 +66,21 @@ export function TemplateDialog() {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          size="icon"
-          className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
-        >
-          <ScrollText />
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button
+              size={label ? "default" : "icon"}
+              className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
+            >
+              {label ? label : <ScrollText />}
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Generate</p>
+        </TooltipContent>
+      </Tooltip>
 
       <DialogContent id="custom_card" className="text-white">
         <DialogHeader>
@@ -114,6 +124,7 @@ export function TemplateDialog() {
               </SelectContent>
             </Select>
           </div>
+
           {selectedTemplate && (
             <PreviewPane srcDoc={selectedTemplate?.htmlContent} />
           )}

@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 import { TemplateDialog } from "./TemplateDialog";
 import { useNavigate } from "@tanstack/react-router";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 interface FormCardProps {
   children: ReactNode;
@@ -26,40 +27,54 @@ export function FormCard({ children, className }: FormCardProps) {
         <div className="flex gap-2">
           {mode !== "create event" && <TemplateDialog />}
           {mode !== "create event" && (
-            <Button
-              className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
-              size="icon"
-              onClick={() => {
-                if (!selectedEvent) return;
-                setMode(
-                  mode === "show participant"
-                    ? "edit participant"
-                    : "edit event"
-                );
-                navigate({
-                  to: "/app/$event/participants",
-                  // @ts-ignore
-                  params: { event: selectedEvent.id },
-                });
-              }}
-            >
-              <Users />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
+                  size="icon"
+                  onClick={() => {
+                    if (!selectedEvent) return;
+                    setMode(
+                      mode === "show participant"
+                        ? "edit participant"
+                        : "edit event"
+                    );
+                    navigate({
+                      to: "/app/$event/participants",
+                      // @ts-ignore
+                      params: { event: selectedEvent.id },
+                    });
+                  }}
+                >
+                  <Users />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View Participants</p>
+              </TooltipContent>
+            </Tooltip>
           )}
           {(mode === "show event" || mode === "show participant") && (
-            <Button
-              className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
-              size="icon"
-              onClick={() => {
-                setMode(
-                  mode === "show participant"
-                    ? "edit participant"
-                    : "edit event"
-                );
-              }}
-            >
-              <PenSquare />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
+                  size="icon"
+                  onClick={() => {
+                    setMode(
+                      mode === "show participant"
+                        ? "edit participant"
+                        : "edit event"
+                    );
+                  }}
+                >
+                  <PenSquare />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
         <Button

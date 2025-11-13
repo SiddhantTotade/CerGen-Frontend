@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import { useNavigate } from "@tanstack/react-router";
 import { HomeIcon, LayoutTemplateIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function Navigation() {
   const navigate = useNavigate();
@@ -15,19 +16,33 @@ export function Navigation() {
         <p>PaperLess</p>
       </div>
       <div className="gap-2 flex">
-        <Button
-          className="cursor-pointer bg-blue-500 hover:bg-blue-600"
-          size="icon"
-        >
-          <HomeIcon />
-        </Button>
-        <Button
-          size="icon"
-          onClick={() => navigate({ to: "/app/templates" })}
-          className="cursor-pointer bg-blue-500 hover:bg-blue-600"
-        >
-          <LayoutTemplateIcon />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="cursor-pointer bg-blue-500 hover:bg-blue-600"
+              size="icon"
+            >
+              <HomeIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Home</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              onClick={() => navigate({ to: "/app/templates" })}
+              className="cursor-pointer bg-blue-500 hover:bg-blue-600"
+            >
+              <LayoutTemplateIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Templates</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
     </Card>
   );

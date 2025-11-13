@@ -7,6 +7,7 @@ import { useFetchParticipants } from "@/hooks/useParticipants";
 import { setCardMode } from "@/state/cardMode";
 import { setSelectedParticipant } from "@/state/selectedParticipant";
 import { useCardMode } from "@/hooks/useCardMode";
+import { TemplateDialog } from "@/components/common/TemplateDialog";
 
 export function ListParticipants() {
   const { event } = useParams({ from: "/app/$event/participants" });
@@ -84,13 +85,7 @@ export function ListParticipants() {
                 >
                   Create Participant
                 </Button>
-                <Button
-                  className="cursor-pointer bg-blue-500 hover:bg-blue-600"
-                  onClick={() => setMode("generate participant template")}
-                  size="sm"
-                >
-                  Generate
-                </Button>
+                <TemplateDialog label="Generate" />
               </>
             )}
 
