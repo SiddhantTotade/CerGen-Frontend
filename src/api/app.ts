@@ -56,6 +56,21 @@ export interface GenerateEventTemplateResponse {
   };
 }
 
+export interface GenerateParticipantTemplateRequest {
+  event_id?: string
+  template_id: string
+  orientation: string
+}
+
+export interface GenerateParticipantTemplateResponse {
+  success: boolean;
+  message: string;
+  data: {
+    html: string;
+    pdf_data: string;
+  }
+}
+
 export const getEvents = async () => {
   const query = `
     query Events {
@@ -337,11 +352,16 @@ export const getEventKeys = async (
   return response.eventData;
 };
 
-export const generateEventTemplate = (
-  data: GenerateEventTemplateRequest
-): Promise<GenerateEventTemplateResponse> => {
+export const generateEventTemplate = (data: GenerateEventTemplateRequest): Promise<GenerateEventTemplateResponse> => {
   return apiFetch("/app/api/generate-event/", {
     method: "POST",
     body: JSON.stringify(data),
   }) as Promise<GenerateEventTemplateResponse>;
 };
+
+export const generateParticipantTemplate = (data: GenerateParticipantTemplateRequest): Promise<GenerateEventTemplateResponse> => {
+  return apiFetch("/app/api/generate-participants/", {
+    method: "POST",
+    body: JSON.stringify(data)
+  }) as Promise<GenerateParticipantTemplateResponse>
+}

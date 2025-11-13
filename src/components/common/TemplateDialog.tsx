@@ -14,9 +14,11 @@ import {
 import { ScrollText } from "lucide-react";
 import { SearchableSelect } from "./SearchableSelect";
 import { useFetchTemplates } from "@/hooks/useTemplates";
-import { useGenerateEventTemplate } from "@/hooks/useGenerateTemplate";
+import {
+  useGenerateEventTemplate,
+  useGenerateParticipantTemplate,
+} from "@/hooks/useGenerateTemplate";
 import PreviewPane from "../pages/templates/components/PreviewPane";
-import { getSelectedEvent } from "@/state/selectedEvents";
 import {
   Select,
   SelectContent,
@@ -36,33 +38,56 @@ export function TemplateDialog({ label }: Props) {
   const { data: templates } = useFetchTemplates();
   const [selectedTemplate, setSelectedTemplate] = React.useState<any>(null);
   const [orientation, setOrientation] = React.useState<string>("");
-  const event = getSelectedEvent();
 
-  const { mutateAsync: generateTemplate, isPending } =
+  // Extract eventId from URL: /app/:eventId/participants
+  const pathname = window.location.pathname;
+  const match = pathname.match(/\/app\/(\d+)\/participants/);
+  const eventId = match ? match[1] : "";
+  const isParticipantsPage = pathname.includes("participants");
+
+  // Hooks for generating PDFs
+  const { mutateAsync: generateEventTemplate, isPending: isEventPending } =
     useGenerateEventTemplate();
+  const { mutateAsync: generateParticipantTemplate, isPending: isParticipantPending } =
+    useGenerateParticipantTemplate();
 
   const handleGenerate = async () => {
-    if (!selectedTemplate?.id || !orientation) return;
+    if (!selectedTemplate?.id || !orientation) {
+      toast("Please select a template and orientation.");
+      return;
+    }
 
     try {
       const payload = {
-        event_id: event?.id || "",
+        event_id: eventId,
         template_id: selectedTemplate.id,
         orientation,
       };
 
-      const res = await generateTemplate(payload);
+      // Call correct API depending on page type
+      const res = isParticipantsPage
+        ? await generateParticipantTemplate(payload)
+        : await generateEventTemplate(payload);
 
       if (res.success) {
-        base64ToPdf(res.data.pdf_data, String(event?.event));
+        if (isParticipantsPage && Array.isArray(res.data)) {
+          const pdfArray = res.data.map((d: any) => d.pdf_data);
+          base64ToPdf(pdfArray, `Event_${eventId}`, "zip");
+        } else if (res.data?.pdf_data) {
+          base64ToPdf(res.data.pdf_data, `Event_${eventId}`, "single");
+        } else {
+          console.error("Invalid or missing PDF data in response:", res);
+        }
       } else {
         toast("Failed: " + res.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong while generating template!");
+      toast("Something went wrong while generating template!");
     }
   };
+
+  const isPending = isEventPending || isParticipantPending;
 
   return (
     <Dialog>
@@ -70,7 +95,7 @@ export function TemplateDialog({ label }: Props) {
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              size={label ? "default" : "icon"}
+              size={label ? "sm" : "icon"}
               className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
             >
               {label ? label : <ScrollText />}
@@ -84,7 +109,9 @@ export function TemplateDialog({ label }: Props) {
 
       <DialogContent id="custom_card" className="text-white">
         <DialogHeader>
-          <DialogTitle>Event Template</DialogTitle>
+          <DialogTitle>
+            {isParticipantsPage ? "Participant Template" : "Event Template"}
+          </DialogTitle>
           <DialogDescription className="text-stone-400">
             Preview your template here.
           </DialogDescription>
