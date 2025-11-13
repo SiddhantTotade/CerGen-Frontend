@@ -44,6 +44,7 @@ export function base64ToPdf(
       });
 
       const zipped = zipSync(files, { level: 9 });
+      // @ts-ignore
       const blob = new Blob([zipped], { type: "application/zip" });
 
       const link = document.createElement("a");
