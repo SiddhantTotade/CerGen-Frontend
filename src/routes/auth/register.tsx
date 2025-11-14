@@ -18,7 +18,7 @@ import { registerSchema } from "@/schemas/auth";
 import type { RegisterForm } from "@/schemas/auth";
 import { AuthCard } from "@/components/common/AuthCard";
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import { GoogleIcon } from "public/assets/google";
+import { GoogleIcon } from "@/assets/google";
 
 export const Route = createFileRoute("/auth/register")({
   component: RegisterPage,
@@ -70,15 +70,15 @@ function RegisterPage() {
 
   return (
     <AuthCard>
-      <CardHeader className="flex">
+      <CardHeader className="flex w-full justify-between">
         <div className="flex flex-col">
           <CardTitle>Create your account</CardTitle>
           <CardDescription>Register and get started</CardDescription>
         </div>
         <div className="flex">
-          <Button>Login</Button>
-          <Button>
-            <GoogleIcon />
+          <Button variant="link" className="cursor-pointer">Login</Button>
+          <Button className="cursor-pointer" size="icon">
+            <GoogleIcon className="w-1/2" />
           </Button>
         </div>
       </CardHeader>
