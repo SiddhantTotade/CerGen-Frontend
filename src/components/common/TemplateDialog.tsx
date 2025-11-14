@@ -29,6 +29,8 @@ import {
 } from "../ui/select";
 import { base64ToPdf } from "@/utils/base64ToPdf";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Spinner } from "../ui/spinner";
+import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 
 interface Props {
   label?: string;
@@ -39,17 +41,24 @@ export function TemplateDialog({ label }: Props) {
   const [selectedTemplate, setSelectedTemplate] = React.useState<any>(null);
   const [orientation, setOrientation] = React.useState<string>("");
 
-  // Extract eventId from URL: /app/:eventId/participants
-  const pathname = window.location.pathname;
-  const match = pathname.match(/\/app\/(\d+)\/participants/);
-  const eventId = match ? match[1] : "";
-  const isParticipantsPage = pathname.includes("participants");
+  const eve = useSelectedEvent();
 
-  // Hooks for generating PDFs
+  const pathname = window.location.pathname;
+
+  const participantsMatch = pathname.match(/\/app\/(\d+)\/participants/);
+  const eventIdFromUrl = participantsMatch ? participantsMatch[1] : null;
+
+  const finalEventId = pathname.includes("participants")
+    ? eventIdFromUrl
+    : eve.selectedEvent?.id ?? "";
+
   const { mutateAsync: generateEventTemplate, isPending: isEventPending } =
     useGenerateEventTemplate();
-  const { mutateAsync: generateParticipantTemplate, isPending: isParticipantPending } =
-    useGenerateParticipantTemplate();
+
+  const {
+    mutateAsync: generateParticipantTemplate,
+    isPending: isParticipantPending,
+  } = useGenerateParticipantTemplate();
 
   const handleGenerate = async () => {
     if (!selectedTemplate?.id || !orientation) {
@@ -59,22 +68,21 @@ export function TemplateDialog({ label }: Props) {
 
     try {
       const payload = {
-        event_id: eventId,
+        event_id: String(finalEventId),
         template_id: selectedTemplate.id,
         orientation,
       };
 
-      // Call correct API depending on page type
-      const res = isParticipantsPage
+      const res = pathname.includes("participants")
         ? await generateParticipantTemplate(payload)
         : await generateEventTemplate(payload);
 
       if (res.success) {
-        if (isParticipantsPage && Array.isArray(res.data)) {
+        if (pathname.includes("participants") && Array.isArray(res.data)) {
           const pdfArray = res.data.map((d: any) => d.pdf_data);
-          base64ToPdf(pdfArray, `Event_${eventId}`, "zip");
+          base64ToPdf(pdfArray, `Event_${finalEventId}`, "zip");
         } else if (res.data?.pdf_data) {
-          base64ToPdf(res.data.pdf_data, `Event_${eventId}`, "single");
+          base64ToPdf(res.data.pdf_data, `Event_${finalEventId}`, "single");
         } else {
           console.error("Invalid or missing PDF data in response:", res);
         }
@@ -110,7 +118,9 @@ export function TemplateDialog({ label }: Props) {
       <DialogContent id="custom_card" className="text-white">
         <DialogHeader>
           <DialogTitle>
-            {isParticipantsPage ? "Participant Template" : "Event Template"}
+            {pathname.includes("participants")
+              ? "Participant Template"
+              : "Event Template"}
           </DialogTitle>
           <DialogDescription className="text-stone-400">
             Preview your template here.
@@ -132,7 +142,7 @@ export function TemplateDialog({ label }: Props) {
             <Select onValueChange={setOrientation} value={orientation}>
               <SelectTrigger
                 style={{ height: "40px" }}
-                className="w-full text-white border-white"
+                className="w-full cursor-pointer text-white border-white"
               >
                 <SelectValue placeholder="Select Orientation" />
               </SelectTrigger>
@@ -141,10 +151,16 @@ export function TemplateDialog({ label }: Props) {
                 className="text-white bg-gray-900 border-gray-700"
               >
                 <SelectGroup>
-                  <SelectItem value="portrait" className="text-white">
+                  <SelectItem
+                    value="portrait"
+                    className="text-white cursor-pointer"
+                  >
                     Portrait
                   </SelectItem>
-                  <SelectItem value="landscape" className="text-white">
+                  <SelectItem
+                    value="landscape"
+                    className="text-white cursor-pointer"
+                  >
                     Landscape
                   </SelectItem>
                 </SelectGroup>
@@ -165,11 +181,12 @@ export function TemplateDialog({ label }: Props) {
           </DialogClose>
           <Button
             type="button"
-            className="bg-blue-500 hover:bg-blue-600 cursor-pointer"
+            className="bg-blue-500 hover:bg-blue-600 cursor-pointer flex gap-2"
             onClick={handleGenerate}
             disabled={isPending}
           >
-            {isPending ? "Generating..." : "Generate"}
+            {isPending && <Spinner />}
+            {isPending ? "Processing" : "Generate"}
           </Button>
         </DialogFooter>
       </DialogContent>

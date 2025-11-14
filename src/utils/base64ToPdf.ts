@@ -8,7 +8,6 @@ export function base64ToPdf(
   try {
     const dateStr = new Date().toLocaleDateString("en-GB").replace(/\//g, "");
 
-    // SINGLE PDF
     if (mode === "single" && typeof base64Data === "string") {
       const cleanedBase64 = base64Data
         .replace(/^data:application\/pdf;base64,/, "")
@@ -29,12 +28,13 @@ export function base64ToPdf(
       return;
     }
 
-    // ZIP MODE
     if (mode === "zip" && Array.isArray(base64Data)) {
       const files: Record<string, Uint8Array> = {};
 
       base64Data.forEach((b64, index) => {
-        const cleaned = b64.replace(/^data:application\/pdf;base64,/, "").trim();
+        const cleaned = b64
+          .replace(/^data:application\/pdf;base64,/, "")
+          .trim();
         const byteChars = atob(cleaned);
         const bytes = new Uint8Array(byteChars.length);
         for (let i = 0; i < byteChars.length; i++) {

@@ -4,7 +4,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
   CardContent,
   CardDescription,
@@ -17,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { loginSchema } from "@/schemas/auth";
 import type { LoginForm } from "@/schemas/auth";
 import { useForm } from "react-hook-form";
+import { AuthCard } from "@/components/common/AuthCard";
 
 export const Route = createFileRoute("/auth/login")({
   component: LoginPage,
@@ -42,10 +42,10 @@ function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-sm absolute top-5 left-5">
+    <AuthCard>
       <CardHeader>
-        <CardTitle>Login to CerGen</CardTitle>
-        <CardDescription>
+        <CardTitle>Login to PaperLess</CardTitle>
+        <CardDescription className="text-gray-400">
           Fill to Generate
         </CardDescription>
         <CardAction>
@@ -89,15 +89,21 @@ function LoginPage() {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <Button type="submit" className="w-full cursor-pointer">
+            <Button
+              type="submit"
+              className="w-full cursor-pointer bg-blue-500 hover:bg-blue-600"
+            >
               Login
             </Button>
-            <Button variant="outline" className="w-full cursor-pointer">
+            <Button
+              variant="outline"
+              className="w-full text-black hover:text-black cursor-pointer"
+            >
               Login with Google
             </Button>
           </div>
         </form>
       </CardContent>
-    </Card>
+    </AuthCard>
   );
 }

@@ -19,8 +19,9 @@ export function Navigation() {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              className="cursor-pointer bg-blue-500 hover:bg-blue-600"
               size="icon"
+              onClick={() => navigate({ to: "/app/events" })}
+              className="cursor-pointer bg-blue-500 hover:bg-blue-600"
             >
               <HomeIcon />
             </Button>
