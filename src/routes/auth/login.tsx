@@ -17,6 +17,7 @@ import { loginSchema } from "@/schemas/auth";
 import type { LoginForm } from "@/schemas/auth";
 import { useForm } from "react-hook-form";
 import { AuthCard } from "@/components/common/AuthCard";
+import { GoogleIcon } from "@/assets/google";
 
 export const Route = createFileRoute("/auth/login")({
   component: LoginPage,
@@ -49,9 +50,19 @@ function LoginPage() {
           Fill to Generate
         </CardDescription>
         <CardAction>
-          <Button className="cursor-pointer" variant="link">
-            Sign Up
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="link"
+              className="cursor-pointer"
+              onClick={() => navigate({ to: "/auth/register" })}
+            >
+              Create
+            </Button>
+
+            <Button className="cursor-pointer" size="icon">
+              <GoogleIcon className="w-1/2" />
+            </Button>
+          </div>
         </CardAction>
       </CardHeader>
 
@@ -73,12 +84,6 @@ function LoginPage() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
               </div>
               <Input id="password" type="password" {...register("password")} />
               {errors.password && (
@@ -94,12 +99,6 @@ function LoginPage() {
               className="w-full cursor-pointer bg-blue-500 hover:bg-blue-600"
             >
               Login
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full text-black hover:text-black cursor-pointer"
-            >
-              Login with Google
             </Button>
           </div>
         </form>

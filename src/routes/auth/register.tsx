@@ -1,8 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useRegister } from "@/hooks/useRegister";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+
+import { useRegister } from "@/hooks/useRegister";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +18,10 @@ import { Label } from "@/components/ui/label";
 import { registerSchema } from "@/schemas/auth";
 import type { RegisterForm } from "@/schemas/auth";
 import { AuthCard } from "@/components/common/AuthCard";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+
+import { ArrowRight, ArrowLeft, AlertOctagon, Check } from "lucide-react";
 import { GoogleIcon } from "@/assets/google";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth/register")({
   component: RegisterPage,
@@ -34,7 +37,8 @@ function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
-    getValues,
+    trigger,
+    reset
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
@@ -49,24 +53,42 @@ function RegisterPage() {
         password2: data.password2,
       },
       {
-        onSuccess: () => navigate({ to: "/app/home" }),
-        onError: (err) => console.error("Register failed:", err.message),
+        onSuccess: () => {
+          reset();
+          setStep(1);
+
+          toast("Registration Successfull", {
+            description: "Please login to proceed",
+            position: "top-center",
+            icon: <Check size="15px" className="text-green-500" />,
+            action: {
+              label: "Login",
+              onClick: () => navigate({ to: "/auth/login" }),
+            },
+          });
+        },
+
+        onError: (err) => {
+          // @ts-ignore
+          toast(err?.data?.errors?.email?.[0] || "Registration failed", {
+            icon: <AlertOctagon size="15px" className="text-red-500" />,
+            position: "top-center",
+          });
+        },
       }
     );
   };
 
-  const handleContinue = () => {
-    const first = getValues("first_name");
-    const last = getValues("last_name");
 
-    if (!first || !last) return alert("Please enter your full name.");
+  const handleContinue = async () => {
+    const isValid = await trigger(["first_name", "last_name"]);
+
+    if (!isValid) return;
 
     setStep(2);
   };
 
-  const handleBack = () => {
-    setStep(1);
-  };
+  const handleBack = () => setStep(1);
 
   return (
     <AuthCard>
@@ -75,8 +97,16 @@ function RegisterPage() {
           <CardTitle>Create your account</CardTitle>
           <CardDescription>Register and get started</CardDescription>
         </div>
-        <div className="flex">
-          <Button variant="link" className="cursor-pointer">Login</Button>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="link"
+            className="cursor-pointer"
+            onClick={() => navigate({ to: "/auth/login" })}
+          >
+            Login
+          </Button>
+
           <Button className="cursor-pointer" size="icon">
             <GoogleIcon className="w-1/2" />
           </Button>
@@ -141,11 +171,7 @@ function RegisterPage() {
 
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...register("password")}
-                />
+                <Input id="password" type="password" {...register("password")} />
                 {errors.password && (
                   <p className="text-red-500 text-sm">
                     {errors.password.message}
@@ -167,15 +193,12 @@ function RegisterPage() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-2 mt-4">
+              <div className="flex flex-col gap-2 mt-2">
                 <Button
                   type="submit"
-                  className="w-full bg-blue-500 hover:bg-blue-600"
+                  className="w-full bg-blue-500 hover:bg-blue-600 cursor-pointer"
                 >
                   Register
-                </Button>
-                <Button variant="outline" className="w-full" type="button">
-                  Register with Google
                 </Button>
               </div>
             </>

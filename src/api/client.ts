@@ -11,8 +11,18 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "API request failed");
+    let errorData = null;
+
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { message: "Unknown error occurred" };
+    }
+
+    throw {
+      status: response.status,
+      data: errorData,
+    };
   }
 
   return response.json();
