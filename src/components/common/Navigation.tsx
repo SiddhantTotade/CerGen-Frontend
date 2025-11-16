@@ -1,11 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import { useNavigate } from "@tanstack/react-router";
-import { HomeIcon, LayoutTemplateIcon } from "lucide-react";
+import { HomeIcon, LayoutTemplateIcon, UserRound } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useLogout } from "@/hooks/useLogout";
 
 export function Navigation() {
   const navigate = useNavigate();
+  const logout = useLogout()
 
   return (
     <Card
@@ -15,7 +18,7 @@ export function Navigation() {
       <div className="flex text-white font-bold text-xl">
         <p>PaperLess</p>
       </div>
-      <div className="gap-2 flex">
+      <div className="gap-1 flex">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -30,6 +33,7 @@ export function Navigation() {
             <p>Home</p>
           </TooltipContent>
         </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -44,6 +48,40 @@ export function Navigation() {
             <p>Templates</p>
           </TooltipContent>
         </Tooltip>
+
+        <Popover>
+          <Tooltip>
+            <TooltipTrigger>
+              <PopoverTrigger asChild>
+                <Button
+                  size="icon"
+                  className="cursor-pointer bg-blue-500 hover:bg-blue-600"
+                >
+                  <UserRound />
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+
+            <TooltipContent>
+              Profile
+            </TooltipContent>
+          </Tooltip>
+
+          <PopoverContent id="custom_card" className="w-40 p-1">
+            <div className="flex flex-col gap-1">
+              <Button
+                className="justify-start bg-white cursor-pointer text-black hover:bg-gray-200"
+              >
+                Change Password
+              </Button>
+
+              <Button onClick={() => { logout.mutate(); navigate({ to: "/auth/login" }) }} className="bg-red-500 hover:bg-red-600 justify-start cursor-pointer text-white">
+                Logout
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
       </div>
     </Card>
   );

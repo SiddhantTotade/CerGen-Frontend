@@ -148,6 +148,27 @@ export const updateEvent = async (
   return response.updateEvent.event;
 };
 
+export const deleteEvent = async (ids: number[]) => {
+  if (!ids?.length) throw new Error("Missing event ids for delete");
+
+  const mutation = `
+    mutation DeleteEvent($ids: [Int!]!) {
+      deleteEvent(ids: $ids) {
+        ok
+      }
+    }
+  `;
+
+  const variables = { ids };
+
+  const response = await graphqlFetch<{
+    deleteEvent: { ok: boolean };
+  }>(mutation, variables);
+
+  return response.deleteEvent.ok;
+};
+
+
 export const getParticipants = async (
   eventId: string
 ): Promise<ParticipantResponse[]> => {
@@ -330,6 +351,27 @@ export const updateTemplate = async (
   // @ts-ignore
   return response.data.updateTemplate.template;
 };
+
+export const deleteTemplate = async (ids: number[]) => {
+  if (!ids?.length) throw new Error("Missing event ids for delete");
+
+  const mutation = `
+    mutation DeleteTemplate($ids: [Int!]!) {
+      deleteTemplate(ids: $ids) {
+        ok
+      }
+    }
+  `;
+
+  const variables = { ids };
+
+  const response = await graphqlFetch<{
+    deleteTemplate: { ok: boolean };
+  }>(mutation, variables);
+
+  return response.deleteTemplate.ok;
+};
+
 
 export const getEventKeys = async (
   eventId: string

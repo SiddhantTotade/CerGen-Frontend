@@ -1,21 +1,21 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useFetchTemplates } from "@/hooks/useTemplates";
+import { useFetchTemplates, useDeleteTemplate } from "@/hooks/useTemplates";
 import { useCardMode } from "@/hooks/useCardMode";
-import { formatToISOWithTZ } from "@/utils/dateTimeConverter";
 import { setSelectedTemplate } from "@/state/selectedTemplate";
-import { setCardMode } from "@/state/cardMode";
+import { formatToISOWithTZ } from "@/utils/dateTimeConverter";
 import { Trash2 } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 export function ListTemplates() {
   const { data: templates, isLoading } = useFetchTemplates();
+  const deleteTemplate = useDeleteTemplate();
   const { mode, setMode } = useCardMode();
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   if (isLoading) return <p>Loading templates...</p>;
   if (!templates?.length) return <p>No templates found.</p>;
@@ -23,25 +23,25 @@ export function ListTemplates() {
   const allSelected = selectedRows.length === templates.length;
 
   const handleSelectAll = () => {
-    if (allSelected) setSelectedRows([]);
-    else setSelectedRows(templates.map((_, i) => i.toString()));
+    if (allSelected) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(templates.map((t: any) => Number(t.id)));
+    }
   };
 
-  const handleRowSelect = (i: number) => {
-    const key = i.toString();
+  const handleRowSelect = (id: number) => {
     setSelectedRows((prev) =>
-      prev.includes(key)
-        ? prev.filter((id) => id !== key)
-        : [...prev, key]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
   const handleDeleteAll = () => {
-    alert("Delete all selected templates!");
+    deleteTemplate.mutate(selectedRows);
   };
 
-  const handleDeleteRow = (i: number) => {
-    alert(`Delete template ${i}`);
+  const handleDeleteRow = (id: number) => {
+    deleteTemplate.mutate([id]);
   };
 
   return (
@@ -49,19 +49,18 @@ export function ListTemplates() {
       <CardContent>
         <div className="p-2 flex justify-between items-center">
           <p className="text-lg text-white font-bold">Templates</p>
+
           <div className="flex gap-2">
             {mode === "none" && !allSelected && (
               <Button
                 className="cursor-pointer text-sm bg-blue-500 hover:bg-blue-600"
-                onClick={() => {
-                  setMode("create template");
-                  navigate({ to: "/app/template/create" });
-                }}
+                onClick={() => setMode("create template")}
                 size="sm"
               >
                 Create Template
               </Button>
             )}
+
             {allSelected && (
               <Button
                 className="cursor-pointer text-sm bg-red-500 hover:bg-red-600"
@@ -81,44 +80,63 @@ export function ListTemplates() {
                 <th className="p-2 w-8 text-left">
                   <Checkbox
                     checked={allSelected}
+                    onClick={(e) => e.stopPropagation()}
                     onCheckedChange={handleSelectAll}
                     className="border-gray-500 data-[state=checked]:bg-blue-500"
                   />
                 </th>
-                <th className="text-left text-white p-2">Template Name</th>
-                <th className="text-left text-white p-2">Created on</th>
-                <th className="text-left text-white p-2">Updated on</th>
-                <th className="text-left text-white p-2 w-20"></th>
+
+                <th className="text-left text-sm text-white p-2">Template Name</th>
+                <th className="text-left text-sm text-white p-2">Created on</th>
+                <th className="text-left text-sm text-white p-2">Updated on</th>
+                <th className="text-left text-sm text-white p-2 w-20"></th>
               </tr>
             </thead>
+
             <tbody>
-              {templates.map((template, i) => {
-                const isSelected = selectedRows.includes(i.toString());
+              {templates.map((template: any) => {
+                const id = Number(template.id);
+                const isSelected = selectedRows.includes(id);
+
                 return (
                   <tr
-                    key={i}
-                    className={`border-t text-sm ${isSelected ? "bg-gray-800" : "hover:bg-gray-700"
+                    key={id}
+                    onClick={() => {
+                      setMode("edit template");
+                      setSelectedTemplate(template);
+                      navigate({ to: `/app/${template.id}/template` })
+                    }}
+                    className={`cursor-pointer border-t text-xs ${isSelected ? "bg-gray-800" : "hover:bg-gray-700"
                       }`}
                   >
                     <td className="p-2 w-8 align-middle">
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => handleRowSelect(i)}
+                        onClick={(e) => e.stopPropagation()}
+                        onCheckedChange={() => handleRowSelect(id)}
                         className="border-gray-500 data-[state=checked]:bg-blue-500"
                       />
                     </td>
-                    {/* @ts-ignore */}
-                    <td className="text-white p-2 cursor-pointer" onClick={() => { setSelectedTemplate(template); setCardMode("edit template"); navigate({ to: `/app/${template.id}/template` }); }}>{template.templateName}</td>
-                    {/* @ts-ignore */}
-                    <td className="text-white p-2">{formatToISOWithTZ(template.createdAt)}</td>
-                    {/* @ts-ignore */}
-                    <td className="text-white p-2">{formatToISOWithTZ(template.updatedAt)}</td>
+
+                    <td className="text-white p-2">{template.templateName}</td>
+
+                    <td className="text-white p-2">
+                      {formatToISOWithTZ(template.createdAt)}
+                    </td>
+
+                    <td className="text-white p-2">
+                      {formatToISOWithTZ(template.updatedAt)}
+                    </td>
+
                     <td className="text-white p-2 text-center">
                       {isSelected && (
                         <Button
                           size="icon"
-                          className="bg-red-500 hover:bg-red-600 text-xs"
-                          onClick={() => handleDeleteRow(i)}
+                          className="bg-red-500 hover:bg-red-600 text-xs cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteRow(id);
+                          }}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

@@ -5,6 +5,7 @@ import {
   getTemplates,
   getTemplateDetails,
   updateTemplate,
+  deleteTemplate,
 } from "@/api/app";
 import type { TemplateRequest, TemplateResponse } from "@/api/app";
 
@@ -57,3 +58,13 @@ export const useUpdateTemplate = () => {
     },
   });
 };
+
+export function useDeleteTemplate() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteTemplate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["templates"] });
+    },
+  });
+}

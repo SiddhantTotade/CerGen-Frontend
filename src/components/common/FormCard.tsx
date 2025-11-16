@@ -30,7 +30,7 @@ export function FormCard({ children, className }: FormCardProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
+                  className=" cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
                   size="icon"
                   onClick={() => {
                     if (!selectedEvent) return;

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCardMode } from "@/hooks/useCardMode";
-import { useFetchEvents } from "@/hooks/useEvents";
+import { useDeleteEvent, useFetchEvents } from "@/hooks/useEvents";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 import { formatToISOWithTZ } from "@/utils/dateTimeConverter";
 import { Trash2 } from "lucide-react";
@@ -12,36 +12,39 @@ export function ListEvents() {
   const { data: events, isLoading } = useFetchEvents();
   const { setSelectedEvent } = useSelectedEvent();
   const { mode, setMode } = useCardMode();
+  const deleteEvent = useDeleteEvent();
 
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   if (isLoading) return <p>Loading events...</p>;
   if (!events?.length) return <p>No events found.</p>;
 
   const allSelected = selectedRows.length === events.length;
 
+  // Select All
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedRows([]);
     } else {
-      // @ts-ignore
-      setSelectedRows(events.map((_, i) => i.toString()));
+      setSelectedRows(events.map((event: any) => Number(event.id)));
     }
   };
 
-  const handleRowSelect = (i: number) => {
-    const key = i.toString();
+  // Select single
+  const handleRowSelect = (id: number) => {
     setSelectedRows((prev) =>
-      prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
+  // Delete All
   const handleDeleteAll = () => {
-    alert("Delete all selected rows!");
+    deleteEvent.mutate(selectedRows);
   };
 
-  const handleDeleteRow = (i: number) => {
-    alert(`Delete row ${i}`);
+  // Delete single
+  const handleDeleteRow = (id: number) => {
+    deleteEvent.mutate([id]);
   };
 
   return (
@@ -49,8 +52,9 @@ export function ListEvents() {
       <CardContent>
         <div className="p-2 flex justify-between items-center">
           <p className="text-lg text-white font-bold">Events</p>
+
           <div className="flex gap-2">
-            {mode === "none" &&  !allSelected && (
+            {mode === "none" && !allSelected && (
               <Button
                 className="cursor-pointer text-sm bg-blue-500 hover:bg-blue-600"
                 onClick={() => setMode("create event")}
@@ -59,6 +63,7 @@ export function ListEvents() {
                 Create Event
               </Button>
             )}
+
             {allSelected && (
               <Button
                 className="cursor-pointer text-sm bg-red-500 hover:bg-red-600"
@@ -78,47 +83,59 @@ export function ListEvents() {
                 <th className="p-2 w-8 text-left">
                   <Checkbox
                     checked={allSelected}
+                    onClick={(e) => e.stopPropagation()}
                     onCheckedChange={handleSelectAll}
                     className="border-gray-500 data-[state=checked]:bg-blue-500"
                   />
                 </th>
-                <th className="text-left text-white p-2">Template Name</th>
-                <th className="text-left text-white p-2">Created on</th>
-                <th className="text-left text-white p-2">Updated on</th>
-                <th className="text-left text-white p-2 w-20"></th>
+                <th className="text-left text-sm text-white p-2">Event Name</th>
+                <th className="text-left text-sm text-white p-2">Created on</th>
+                <th className="text-left text-sm text-white p-2">Updated on</th>
+                <th className="text-left text-sm text-white p-2 w-20"></th>
               </tr>
             </thead>
+
             <tbody>
-              {events.map((event, i) => {
-                const isSelected = selectedRows.includes(i.toString());
+              {events.map((event: any) => {
+                const id = Number(event.id);
+                const isSelected = selectedRows.includes(id);
+
                 return (
                   <tr
-                    key={i}
+                    key={id}
                     onClick={() => {
-                      setMode("show event"); setSelectedEvent(event)
+                      setMode("show event");
+                      setSelectedEvent(event);
                     }}
-                    className={`cursor-pointer border-t text-sm ${isSelected ? "bg-gray-800" : "hover:bg-gray-700"
+                    className={`cursor-pointer border-t text-xs ${isSelected ? "bg-gray-800" : "hover:bg-gray-700"
                       }`}
                   >
                     <td className="p-2 w-8 align-middle">
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => handleRowSelect(i)}
+                        onClick={(e) => e.stopPropagation()}
+                        onCheckedChange={() => handleRowSelect(id)}
                         className="border-gray-500 data-[state=checked]:bg-blue-500"
                       />
                     </td>
-                    {/* @ts-ignore */}
+
                     <td className="text-white p-2">{event.event}</td>
-                    {/* @ts-ignore */}
-                    <td className="text-white p-2">{formatToISOWithTZ(event.createdAt)}</td>
-                    {/* @ts-ignore */}
-                    <td className="text-white p-2">{formatToISOWithTZ(event.updatedAt)}</td>
+                    <td className="text-white p-2">
+                      {formatToISOWithTZ(event.createdAt)}
+                    </td>
+                    <td className="text-white p-2">
+                      {formatToISOWithTZ(event.updatedAt)}
+                    </td>
+
                     <td className="text-white p-2 text-center">
                       {isSelected && (
                         <Button
                           size="icon"
-                          className="bg-red-500 hover:bg-red-600 text-xs"
-                          onClick={() => handleDeleteRow(i)}
+                          className="bg-red-500 hover:bg-red-600 text-xs cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteRow(id);
+                          }}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

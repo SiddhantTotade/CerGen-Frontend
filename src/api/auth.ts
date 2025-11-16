@@ -6,11 +6,11 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  first_name:string,
+  first_name: string,
   last_name: string,
   email: string;
   password: string;
-  password2:string;
+  password2: string;
 }
 
 export interface LoginResponse {
@@ -44,3 +44,9 @@ export const register = (data: RegisterRequest): Promise<RegisterResponse> => {
     body: JSON.stringify(data),
   });
 };
+
+export const logout = () => {
+  return apiFetch('/auth/api/logout/', {
+    method: 'GET',
+  })
+}

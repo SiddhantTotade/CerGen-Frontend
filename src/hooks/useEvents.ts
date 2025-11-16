@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { getEvents, createEvent, updateEvent, getEventKeys } from "@/api/app";
+import { getEvents, createEvent, updateEvent, getEventKeys, deleteEvent } from "@/api/app";
 import type { EventRequest, EventResponse, EventKeyResponse } from "@/api/app";
 
 export const useGetKeys = (eventId: string) => {
@@ -50,3 +50,13 @@ export const useUpdateEvent = () => {
     },
   });
 };
+
+export function useDeleteEvent() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteEvent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+}
