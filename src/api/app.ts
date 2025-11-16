@@ -251,6 +251,27 @@ export const updateParticipant = async (
   return response.updateParticipant.participant;
 };
 
+export const deleteParticipant = async (ids: number[]) => {
+  if (!ids?.length) throw new Error("Missing participant ids for delete");
+
+  const mutation = `
+    mutation DeleteParticipant($ids: [Int!]!) {
+      deleteParticipant(ids: $ids) {
+        ok
+      }
+    }
+  `;
+
+  const variables = { ids };
+
+  const response = await graphqlFetch<{
+    deleteParticipant: { ok: boolean };
+  }>(mutation, variables);
+
+  return response.deleteParticipant.ok;
+};
+
+
 export const getTemplates = async (): Promise<TemplateResponse[]> => {
   const query = `
     query GetTemplates {
@@ -353,7 +374,7 @@ export const updateTemplate = async (
 };
 
 export const deleteTemplate = async (ids: number[]) => {
-  if (!ids?.length) throw new Error("Missing event ids for delete");
+  if (!ids?.length) throw new Error("Missing template ids for delete");
 
   const mutation = `
     mutation DeleteTemplate($ids: [Int!]!) {

@@ -21,7 +21,6 @@ export function ListEvents() {
 
   const allSelected = selectedRows.length === events.length;
 
-  // Select All
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedRows([]);
@@ -30,19 +29,16 @@ export function ListEvents() {
     }
   };
 
-  // Select single
   const handleRowSelect = (id: number) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  // Delete All
   const handleDeleteAll = () => {
     deleteEvent.mutate(selectedRows);
   };
 
-  // Delete single
   const handleDeleteRow = (id: number) => {
     deleteEvent.mutate([id]);
   };

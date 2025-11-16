@@ -1,85 +1,106 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useParams } from "@tanstack/react-router";
-import { useFetchParticipants } from "@/hooks/useParticipants";
-import { setCardMode } from "@/state/cardMode";
-import { setSelectedParticipant } from "@/state/selectedParticipant";
+import { useFetchParticipants, useDeleteParticipant } from "@/hooks/useParticipants";
 import { useCardMode } from "@/hooks/useCardMode";
+import { useSelectedParticipant } from "@/hooks/useSelectedParticipant";
 import { TemplateDialog } from "@/components/common/TemplateDialog";
+import { Trash2 } from "lucide-react";
 
 export function ListParticipants() {
   const { event } = useParams({ from: "/app/$event/participants" });
   const { data: participants, isLoading } = useFetchParticipants(event ?? "");
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const deleteParticipant = useDeleteParticipant();
   const { mode, setMode } = useCardMode();
+  const { setSelectedParticipant } = useSelectedParticipant();
 
-  if (isLoading) return <p>Loading participants...</p>;
-  if (!participants?.length)
-    return (
-      <Card className="w-[40%] p-4 text-center text-gray-500">
-        No participants found
-      </Card>
-    );
-  // @ts-ignore
-  const eventName = participants[0]?.event?.event || "Event";
+  const [localParticipants, setLocalParticipants] = useState<any[]>([]);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
-  const parsedParticipants = participants.map((p) => ({
-    ...p,
-    participant_details:
-      // @ts-ignore
-      typeof p.participantDetails === "string"
-        ? // @ts-ignore
-          JSON.parse(p.participantDetails)
-        : p.participant_details || {},
-  }));
-
-  const getAllKeys = (data: any[]) => {
-    const keys = new Set<string>();
-    data.forEach((item) => {
-      Object.keys(item.participant_details || {}).forEach((key) =>
-        keys.add(key)
+  useEffect(() => {
+    if (participants) {
+      setLocalParticipants(
+        participants.map((p) => ({
+          ...p,
+          participant_details:
+            typeof p.participant_details === "string"
+              ? JSON.parse(p.participant_details)
+              : p.participant_details || {},
+        }))
       );
-    });
-    return Array.from(keys);
-  };
+    }
+  }, [participants]);
 
-  const detailKeys = getAllKeys(parsedParticipants);
-  const allSelected = selectedRows.length === parsedParticipants.length;
+  const detailKeys = Array.from(
+    new Set(localParticipants.flatMap((p) => Object.keys(p.participant_details || {})))
+  );
+
+  const allSelected = selectedRows.length === localParticipants.length;
 
   const handleSelectAll = () => {
     if (allSelected) setSelectedRows([]);
-    else setSelectedRows(parsedParticipants.map((_, i) => i.toString()));
+    else setSelectedRows(localParticipants.map((p) => Number(p.id)));
   };
 
-  const handleRowSelect = (i: number) => {
-    const key = i.toString();
+  const handleRowSelect = (id: number) => {
     setSelectedRows((prev) =>
-      prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
   const handleDeleteAll = () => {
-    alert("Delete all selected participants!");
+    deleteParticipant.mutate(selectedRows, {
+      onSuccess: () => {
+        setLocalParticipants((prev) =>
+          prev.filter((p) => !selectedRows.includes(Number(p.id)))
+        );
+        setSelectedRows([]);
+      },
+    });
   };
 
-  const handleDeleteRow = (i: number) => {
-    alert(`Delete participant ${i + 1}`);
+  const handleDeleteRow = (id: number) => {
+    deleteParticipant.mutate([id], {
+      onSuccess: () => {
+        setLocalParticipants((prev) => prev.filter((p) => Number(p.id) !== id));
+        setSelectedRows((prev) => prev.filter((x) => x !== id));
+      },
+    });
   };
+
+  const eventName = localParticipants[0]?.event?.event || "Event";
+
+  if (!localParticipants.length) {
+    return (
+      <Card id="custom_card" className="w-[40%] flex justify-center">
+        <CardContent className="w-full text-center p-4 flex flex-col gap-4">
+          <p className="text-gray-400 text-lg">No participants found</p>
+          <div className="flex justify-center gap-2">
+            <Button
+              className="bg-blue-500 hover:bg-blue-600"
+              onClick={() => setMode("create participant")}
+              size="sm"
+            >
+              Create Participant
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card id="custom_card" className="w-[40%] flex justify-center">
-      <CardContent className="w-full">
+      <CardContent>
         <div className="p-2 flex justify-between items-center">
-          <p className="text-lg text-white font-bold">
-            {eventName} | Participants
-          </p>
-          <div className="flex items-center gap-2">
+          <p className="text-lg text-white font-bold">{eventName} | Participants</p>
+          <div className="flex gap-2">
             {mode === "none" && !allSelected && (
               <>
                 <Button
-                  className="cursor-pointer bg-blue-500 hover:bg-blue-600"
+                  className="cursor-pointer text-sm bg-blue-500 hover:bg-blue-600"
                   onClick={() => setMode("create participant")}
                   size="sm"
                 >
@@ -88,7 +109,6 @@ export function ListParticipants() {
                 <TemplateDialog label="Generate" />
               </>
             )}
-
             {allSelected && (
               <Button
                 className="cursor-pointer text-sm bg-red-500 hover:bg-red-600"
@@ -104,10 +124,11 @@ export function ListParticipants() {
         <div className="h-[45vh] overflow-y-auto relative">
           <table className="w-full border-collapse">
             <thead className="bg-gray-900 sticky top-0 z-10">
-              <tr>
+              <tr className="text-sm">
                 <th className="p-2 w-8 text-left">
                   <Checkbox
                     checked={allSelected}
+                    onClick={(e) => e.stopPropagation()}
                     onCheckedChange={handleSelectAll}
                     className="border-gray-500 data-[state=checked]:bg-blue-500"
                   />
@@ -122,32 +143,31 @@ export function ListParticipants() {
             </thead>
 
             <tbody>
-              {parsedParticipants.map((p, i) => {
-                const isSelected = selectedRows.includes(i.toString());
+              {localParticipants.map((p) => {
+                const id = Number(p.id);
+                const isSelected = selectedRows.includes(id);
+
                 return (
                   <tr
-                    key={p.id}
-                    className={`border-t text-sm ${
-                      isSelected ? "bg-gray-800" : "hover:bg-gray-700"
-                    }`}
+                    key={id}
+                    onClick={() => {
+                      setMode("show participant");
+                      setSelectedParticipant(p);
+                    }}
+                    className={`cursor-pointer border-t text-xs ${isSelected ? "bg-gray-800" : "hover:bg-gray-700"
+                      }`}
                   >
                     <td className="p-2 w-8 align-middle">
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => handleRowSelect(i)}
+                        onClick={(e) => e.stopPropagation()}
+                        onCheckedChange={() => handleRowSelect(id)}
                         className="border-gray-500 data-[state=checked]:bg-blue-500"
                       />
                     </td>
 
                     {detailKeys.map((key) => (
-                      <td
-                        key={key}
-                        className="text-white p-2 cursor-pointer"
-                        onClick={() => {
-                          setCardMode("show participant");
-                          setSelectedParticipant(p);
-                        }}
-                      >
+                      <td key={key} className="text-white p-2">
                         {p.participant_details?.[key] ?? "-"}
                       </td>
                     ))}
@@ -155,11 +175,14 @@ export function ListParticipants() {
                     <td className="text-white p-2 text-center">
                       {isSelected && (
                         <Button
-                          size="sm"
-                          className="bg-red-500 hover:bg-red-600 text-xs"
-                          onClick={() => handleDeleteRow(i)}
+                          size="icon"
+                          className="bg-red-500 hover:bg-red-600 text-xs cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteRow(id);
+                          }}
                         >
-                          Delete
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       )}
                     </td>

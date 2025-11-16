@@ -123,12 +123,14 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
             alert("Participant Updated Successfully")
             setSelectedParticipant(payload)
             setMode("show participant")
+            reset()
           }
         })
       } else {
         createParticipantMutation.mutate(payload as any, {
           onSuccess: () => {
             alert("Participant Created Successfully");
+            setSelectedParticipant(payload)
             setMode("show participant");
             reset();
           },
