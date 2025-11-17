@@ -8,7 +8,7 @@ import { useLogout } from "@/hooks/useLogout";
 
 export function Navigation() {
   const navigate = useNavigate();
-  const logout = useLogout()
+  const logout = useLogout();
 
   return (
     <Card
@@ -62,26 +62,30 @@ export function Navigation() {
               </PopoverTrigger>
             </TooltipTrigger>
 
-            <TooltipContent>
-              Profile
-            </TooltipContent>
+            <TooltipContent>Profile</TooltipContent>
           </Tooltip>
 
           <PopoverContent id="custom_card" className="w-40 p-1">
             <div className="flex flex-col gap-1">
               <Button
+                onClick={() => navigate({ to: "/app/profile" })}
                 className="justify-start bg-white cursor-pointer text-black hover:bg-gray-200"
               >
-                Change Password
+                Profile
               </Button>
 
-              <Button onClick={() => { logout.mutate(); navigate({ to: "/auth/login" }) }} className="bg-red-500 hover:bg-red-600 justify-start cursor-pointer text-white">
+              <Button
+                onClick={() => {
+                  logout.mutate();
+                  navigate({ to: "/auth/login" });
+                }}
+                className="bg-red-500 hover:bg-red-600 justify-start cursor-pointer text-white"
+              >
                 Logout
               </Button>
             </div>
           </PopoverContent>
         </Popover>
-
       </div>
     </Card>
   );

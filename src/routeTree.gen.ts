@@ -14,6 +14,7 @@ import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AppTemplatesRouteImport } from './routes/app/templates'
+import { Route as AppProfileRouteImport } from './routes/app/profile'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppEventsRouteImport } from './routes/app/events'
 import { Route as AppEvent_detailsRouteImport } from './routes/app/event_details'
@@ -44,6 +45,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
 const AppTemplatesRoute = AppTemplatesRouteImport.update({
   id: '/app/templates',
   path: '/app/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/app/profile',
+  path: '/app/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppHomeRoute = AppHomeRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/app/event_details': typeof AppEvent_detailsRoute
   '/app/events': typeof AppEventsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/profile': typeof AppProfileRoute
   '/app/templates': typeof AppTemplatesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/app/event_details': typeof AppEvent_detailsRoute
   '/app/events': typeof AppEventsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/profile': typeof AppProfileRoute
   '/app/templates': typeof AppTemplatesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/app/event_details': typeof AppEvent_detailsRoute
   '/app/events': typeof AppEventsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/profile': typeof AppProfileRoute
   '/app/templates': typeof AppTemplatesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/app/event_details'
     | '/app/events'
     | '/app/home'
+    | '/app/profile'
     | '/app/templates'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/app/event_details'
     | '/app/events'
     | '/app/home'
+    | '/app/profile'
     | '/app/templates'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/app/event_details'
     | '/app/events'
     | '/app/home'
+    | '/app/profile'
     | '/app/templates'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AppEvent_detailsRoute: typeof AppEvent_detailsRoute
   AppEventsRoute: typeof AppEventsRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppTemplatesRoute: typeof AppTemplatesRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/app/templates'
       fullPath: '/app/templates'
       preLoaderRoute: typeof AppTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/profile': {
+      id: '/app/profile'
+      path: '/app/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/home': {
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppEvent_detailsRoute: AppEvent_detailsRoute,
   AppEventsRoute: AppEventsRoute,
   AppHomeRoute: AppHomeRoute,
+  AppProfileRoute: AppProfileRoute,
   AppTemplatesRoute: AppTemplatesRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
