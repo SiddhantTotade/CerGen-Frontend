@@ -41,7 +41,7 @@ function RouteComponent() {
         </p>
         <div className="flex items-center justify-between">
           <p>
-            Welcome, {data?.first_name} {data?.last_name}
+            <small>Welcome,</small> {data?.first_name} {data?.last_name}
           </p>
           <small>{data?.email}</small>
         </div>

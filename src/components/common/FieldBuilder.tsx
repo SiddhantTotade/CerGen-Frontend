@@ -9,47 +9,63 @@ import { Button } from "@/components/ui/button";
 import { useCardMode } from "@/hooks/useCardMode";
 import { useSelectedEvent } from "@/hooks/useSelectedEvent";
 import { useCreateEvent, useUpdateEvent } from "@/hooks/useEvents";
-import { eventSchema, participantSchema, type EventForm as BaseEventForm, type ParticipantForm as BaseParticipantForm } from "@/schemas/app";
+import {
+  eventSchema,
+  participantSchema,
+  type EventForm as BaseEventForm,
+  type ParticipantForm as BaseParticipantForm,
+} from "@/schemas/app";
 import { useSelectedParticipant } from "@/hooks/useSelectedParticipant";
-import { useCreateParticipants, useUpdateParticipants } from "@/hooks/useParticipants";
+import {
+  useCreateParticipants,
+  useUpdateParticipants,
+} from "@/hooks/useParticipants";
+import { toast } from "sonner";
 
 export type EventForm = BaseEventForm & { id?: string };
-export type ParticipantForm = BaseParticipantForm & { id?: string }
+export type ParticipantForm = BaseParticipantForm & { id?: string };
 
-export type CombinedForm = EventForm | ParticipantForm
+export type CombinedForm = EventForm | ParticipantForm;
 
 export function FieldBuilder({ eventId }: { eventId?: string }) {
   const createEventMutation = useCreateEvent();
   const updateEventMutation = useUpdateEvent();
-  const createParticipantMutation = useCreateParticipants(eventId || "")
-  const updateParticipantMutation = useUpdateParticipants()
+  const createParticipantMutation = useCreateParticipants(eventId || "");
+  const updateParticipantMutation = useUpdateParticipants();
 
   const { mode, setMode } = useCardMode();
   const { selectedEvent, setSelectedEvent } = useSelectedEvent();
-  const { selectedParticipant, setSelectedParticipant } = useSelectedParticipant()
+  const { selectedParticipant, setSelectedParticipant } =
+    useSelectedParticipant();
 
-  const isParticipantMode = mode.includes("participant") ? true : false
-  const schema = isParticipantMode ? participantSchema : eventSchema
+  const isParticipantMode = mode.includes("participant") ? true : false;
+  const schema = isParticipantMode ? participantSchema : eventSchema;
 
-  const { register, control, handleSubmit, formState: { errors }, reset } = useForm<CombinedForm>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CombinedForm>({
     resolver: zodResolver(schema as any),
     defaultValues: isParticipantMode
       ? ({
-        id: undefined,
-        event: eventId,
-        participant_details: [{ label: "", value: "" }],
-      } as BaseParticipantForm)
+          id: undefined,
+          event: eventId,
+          participant_details: [{ label: "", value: "" }],
+        } as BaseParticipantForm)
       : ({
-        id: undefined,
-        event: "",
-        details: [{ label: "", value: "" }],
-      } as BaseEventForm),
+          id: undefined,
+          event: "",
+          details: [{ label: "", value: "" }],
+        } as BaseEventForm),
   });
 
   const { fields, append, remove, replace } = useFieldArray({
     control,
-    name: isParticipantMode ? "participant_details" : "details"
-  })
+    name: isParticipantMode ? "participant_details" : "details",
+  });
 
   useEffect(() => {
     if (mode === "edit event" && selectedEvent) {
@@ -58,10 +74,12 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
           ? JSON.parse(selectedEvent.details)
           : selectedEvent.details || {};
 
-      const detailsArray = Object.entries(detailsRecord).map(([label, value]) => ({
-        label,
-        value: String(value ?? ""),
-      }));
+      const detailsArray = Object.entries(detailsRecord).map(
+        ([label, value]) => ({
+          label,
+          value: String(value ?? ""),
+        })
+      );
 
       reset({
         id: selectedEvent.id,
@@ -70,17 +88,18 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       });
 
       replace(detailsArray);
-    }
-    else if (mode === "edit participant" && selectedParticipant && eventId) {
+    } else if (mode === "edit participant" && selectedParticipant && eventId) {
       const participantRecord: Record<string, unknown> =
         typeof selectedParticipant.participant_details === "string"
           ? JSON.parse(selectedParticipant.participant_details)
           : selectedParticipant.participant_details || {};
 
-      const detailsArray = Object.entries(participantRecord).map(([label, value]) => ({
-        label,
-        value: String(value ?? ""),
-      }));
+      const detailsArray = Object.entries(participantRecord).map(
+        ([label, value]) => ({
+          label,
+          value: String(value ?? ""),
+        })
+      );
 
       reset({
         id: selectedParticipant.id,
@@ -89,8 +108,7 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       });
 
       replace(detailsArray);
-    }
-    else if (mode === "create participant" && eventId) {
+    } else if (mode === "create participant" && eventId) {
       const emptyRow = [{ label: "", value: "" }];
       reset({
         id: undefined,
@@ -100,7 +118,6 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       replace(emptyRow);
     }
   }, [mode, selectedEvent, selectedParticipant, eventId, reset, replace]);
-
 
   const onSubmit = (data: CombinedForm) => {
     if (isParticipantMode) {
@@ -120,17 +137,17 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       if (mode === "edit participant") {
         updateParticipantMutation.mutate(payload as any, {
           onSuccess: () => {
-            alert("Participant Updated Successfully")
-            setSelectedParticipant(payload)
-            setMode("show participant")
-            reset()
-          }
-        })
+            toast("Participant Updated Successfully");
+            setSelectedParticipant(payload);
+            setMode("show participant");
+            reset();
+          },
+        });
       } else {
         createParticipantMutation.mutate(payload as any, {
           onSuccess: () => {
-            alert("Participant Created Successfully");
-            setSelectedParticipant(payload)
+            toast("Participant Created Successfully");
+            setSelectedParticipant(payload);
             setMode("show participant");
             reset();
           },
@@ -154,7 +171,7 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       if (mode === "edit event") {
         updateEventMutation.mutate(payload as any, {
           onSuccess: () => {
-            alert("Event Updated Successfully");
+            toast("Event Updated Successfully");
             setSelectedEvent(payload);
             setMode("show event");
           },
@@ -163,7 +180,7 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
       } else {
         createEventMutation.mutate(payload as any, {
           onSuccess: () => {
-            alert("Event Created Successfully");
+            toast("Event Created Successfully");
             setSelectedEvent(payload);
             setMode("show event");
           },
@@ -180,35 +197,35 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
         onSubmit={handleSubmit(onSubmit as any)}
       >
         <h2 className="text-xl font-bold mb-2">
-          {
-            mode === "edit event"
-              ? "Edit Event"
-              : mode === "create participant"
-                ? "Create Participant"
-                : mode === "edit participant"
-                  ? "Edit Participant"
-                  : mode === "show event"
-                    ? "Show Event"
-                    : mode === "show participant"
-                      ? "Show Participant"
-                      : mode === "create event"
-                        ? "Create Event"
-                        : ""
-          }
+          {mode === "edit event"
+            ? "Edit Event"
+            : mode === "create participant"
+            ? "Create Participant"
+            : mode === "edit participant"
+            ? "Edit Participant"
+            : mode === "show event"
+            ? "Show Event"
+            : mode === "show participant"
+            ? "Show Participant"
+            : mode === "create event"
+            ? "Create Event"
+            : ""}
         </h2>
         <div className="flex-1 overflow-y-auto p-2">
-          {!isParticipantMode &&
+          {!isParticipantMode && (
             <Input
               type="text"
               placeholder="Title of the Event"
               {...register("event")}
               className="mb-1"
             />
-          }
-          {errors.event && (
-            <p className="text-red-500 pl-1 text-[10px]">{errors.event.message}</p>
           )}
-          {isParticipantMode &&
+          {errors.event && (
+            <p className="text-red-500 pl-1 text-[10px]">
+              {errors.event.message}
+            </p>
+          )}
+          {isParticipantMode && (
             <Input
               type="hidden"
               placeholder="Title of the Event"
@@ -216,10 +233,12 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
               {...register("event")}
               className="mb-1"
             />
-          }
+          )}
 
           {fields.map((field, index) => {
-            const fieldName = isParticipantMode ? "participant_details" : "details"
+            const fieldName = isParticipantMode
+              ? "participant_details"
+              : "details";
             return (
               <div key={field.id} className="flex items-center gap-2 mt-2">
                 <Input
@@ -245,7 +264,7 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
                   <Trash2 />
                 </Button>
               </div>
-            )
+            );
           })}
         </div>
         <div className="bottom-0 w-full absolute flex justify-between pt-3 border-t">
@@ -258,7 +277,12 @@ export function FieldBuilder({ eventId }: { eventId?: string }) {
           >
             <Plus /> Add Field
           </Button>
-          <Button className="bg-blue-500 hover:bg-blue-600 cursor-pointer" asChild={false} size="sm" type="submit">
+          <Button
+            className="bg-blue-500 hover:bg-blue-600 cursor-pointer"
+            asChild={false}
+            size="sm"
+            type="submit"
+          >
             {mode === "edit event" ? "Update" : "Submit"}
           </Button>
         </div>

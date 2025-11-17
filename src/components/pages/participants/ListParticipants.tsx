@@ -79,7 +79,7 @@ export function ListParticipants() {
           <p className="text-gray-400 text-lg">No participants found</p>
           <div className="flex justify-center gap-2">
             <Button
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-blue-500 cursor-pointer hover:bg-blue-600"
               onClick={() => setMode("create participant")}
               size="sm"
             >
