@@ -46,7 +46,7 @@ function ForgotPasswordPage() {
       <CardHeader>
         <CardTitle>Forgot Password</CardTitle>
         <CardDescription className="text-gray-400">
-          Reset your password
+          Request password reset
         </CardDescription>
         <CardAction>
           <div className="flex items-center gap-2">

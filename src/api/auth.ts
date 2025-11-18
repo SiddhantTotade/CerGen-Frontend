@@ -40,6 +40,17 @@ export interface ChangePasswordResponse {
   data: string;
 }
 
+export interface ResetPasswordRequest {
+  uid: string;
+  token: string;
+  password: string;
+  password2: string;
+}
+
+export interface ResetPasswordResponse {
+  data: string;
+}
+
 export interface ForgotPasswordRequest {
   email: string;
 }
@@ -82,6 +93,15 @@ export const changePassword = (
   data: ChangePasswordRequest
 ): Promise<ChangePasswordResponse> => {
   return apiFetch("/auth/api/change-password/", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+};
+
+export const resetPassword = (
+  data: ResetPasswordRequest
+): Promise<ResetPasswordResponse> => {
+  return apiFetch(`/auth/api/reset-password/${data.uid}/${data.token}/`, {
     method: "POST",
     body: JSON.stringify(data),
   });
