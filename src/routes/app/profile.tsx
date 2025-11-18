@@ -39,9 +39,9 @@ function RouteComponent() {
         <p>
           <b>Profile</b>
         </p>
-        <div className="flex items-center justify-between">
+        <div className="flex border-b p-3 items-center justify-between">
           <p>
-            <small>Welcome,</small> {data?.first_name} {data?.last_name}
+            <small>Welcome, </small><b>{data?.first_name} {data?.last_name}</b>
           </p>
           <small>{data?.email}</small>
         </div>

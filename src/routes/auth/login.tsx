@@ -37,7 +37,7 @@ function LoginPage() {
 
   const onSubmit = (data: LoginForm) => {
     loginMutation.mutate(data, {
-      onSuccess: () => navigate({ to: "/app/home" }),
+      onSuccess: () => navigate({ to: "/app/events" }),
       onError: (err) => console.error("Login failed:", err.message),
     });
   };

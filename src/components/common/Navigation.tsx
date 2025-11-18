@@ -79,7 +79,7 @@ export function Navigation() {
                   logout.mutate();
                   navigate({ to: "/auth/login" });
                 }}
-                className="bg-red-500 hover:bg-red-600 justify-start cursor-pointer text-white"
+                className="bg-red-500 flex hover:bg-red-600 justify-start cursor-pointer text-white"
               >
                 Logout
               </Button>

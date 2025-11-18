@@ -22,6 +22,8 @@ import { eventKeysKey } from "@/state/selectedTemplateKeys";
 import TemplateFields from "./TemplateField";
 import EventKeysSection from "./EventKeysSection";
 import HTMLTextEditor from "./HTMLTextEditor";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 interface TemplateFormProps {
   templateId?: string;
@@ -38,6 +40,7 @@ export default function TemplateForm({
   const createTemplate = useCreateTemplate();
   const updateTemplate = useUpdateTemplate();
   const selectedTemplate = getSelectedTemplate();
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient();
   const [eventKeys, setEventKeysState] = useState(
@@ -110,11 +113,12 @@ export default function TemplateForm({
 
     mutation.mutate(payload, {
       onSuccess: (res) => {
-        alert(
+        toast(
           isEditMode
             ? "Template updated successfully"
             : "Template created successfully"
         );
+        navigate({ to: "/app/templates" })
         setSelectedTemplate(res);
       },
     });
