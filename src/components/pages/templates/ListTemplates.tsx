@@ -18,7 +18,15 @@ export function ListTemplates() {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   if (isLoading) return <p>Loading templates...</p>;
-  if (!templates?.length) return <p>No templates found.</p>;
+  if (!templates?.length) return <div>
+    <Button
+      className="cursor-pointer text-sm bg-blue-500 hover:bg-blue-600"
+      onClick={() => { setMode("create template"); navigate({ to: "/app/template/create" }) }}
+      size="sm"
+    >
+      Create Template
+    </Button>
+  </div>;
 
   const allSelected = selectedRows.length === templates.length;
 
@@ -54,7 +62,7 @@ export function ListTemplates() {
             {mode === "none" && !allSelected && (
               <Button
                 className="cursor-pointer text-sm bg-blue-500 hover:bg-blue-600"
-                onClick={() => setMode("create template")}
+                onClick={() => { setMode("create template"); navigate({ to: "/app/template/create" }) }}
                 size="sm"
               >
                 Create Template
