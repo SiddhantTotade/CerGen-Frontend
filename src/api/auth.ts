@@ -40,6 +40,14 @@ export interface ChangePasswordResponse {
   data: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  data: string;
+}
+
 export interface Profile {
   id: string;
   first_name: string;
@@ -61,9 +69,12 @@ export const register = (data: RegisterRequest): Promise<RegisterResponse> => {
   });
 };
 
-export const logout = () => {
-  return apiFetch("/auth/api/logout/", {
-    method: "GET",
+export const forgotPassword = (
+  data: ForgotPasswordRequest
+): Promise<ForgotPasswordResponse> => {
+  return apiFetch("/auth/api/forgot-password/", {
+    method: "POST",
+    body: JSON.stringify(data),
   });
 };
 
@@ -78,6 +89,12 @@ export const changePassword = (
 
 export const profile = (): Promise<Profile> => {
   return apiFetch("/auth/api/profile/", {
+    method: "GET",
+  });
+};
+
+export const logout = () => {
+  return apiFetch("/auth/api/logout/", {
     method: "GET",
   });
 };
