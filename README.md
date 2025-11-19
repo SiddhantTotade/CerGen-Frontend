@@ -28,7 +28,7 @@ git clone git@github.com:SiddhantTotade/PaperLess-Frontend.git
 cd clone PaperLess-Frontend
 ```
 
-- Install the dependencies (Make sure that you've installed ![pnpm](https://pnpm.io/installation))
+- Install the dependencies (Make sure that you've installed [pnpm](https://pnpm.io/installation))
 
 ```shell
 pnpm install
